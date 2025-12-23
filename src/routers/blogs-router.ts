@@ -23,25 +23,21 @@ import {
     createIdValidator,
 } from "../validation/id-verification-and-validation";
 import {InputGetBlogPostsByIdQuery} from "./router-types/blog-search-by-id-input-model";
+import {IdParamName} from "./util-enums/id-names";
 
 export const blogsRouter = Router();
 
-export enum IdParamName {
-    Id = 'id',
-    BlogId = 'blogId',
-}
-
-const validateBlogId = createIdValidator<'blogId', InputGetBlogPostsByIdQuery>({
+const validateBlogIdForSeveralPostsGetterEndpoint = createIdValidator<'blogId', InputGetBlogPostsByIdQuery>({
     paramKey: IdParamName.BlogId,
     collectionName: CollectionNames.Blogs,
 });
 
-const validateBlogId2 = createIdValidator({
+const validateBlogIdForBlogPostCreationEndpoint = createIdValidator({
     paramKey: IdParamName.BlogId,
     collectionName: CollectionNames.Blogs,
 });
 
-const validateBlogId3 = createIdValidator({
+const validateBlogIdForGeneralCRUDEndpoints = createIdValidator({
     paramKey: IdParamName.Id,
     collectionName: CollectionNames.Blogs,
 });
@@ -50,12 +46,12 @@ const validateBlogId3 = createIdValidator({
 blogsRouter.get('/', inputPaginationValidator(BlogsSortListEnum), inputErrorManagementMiddleware, getSeveralBlogs);
 blogsRouter.post('/', superAdminGuardMiddleware, blogInputModelValidation, inputErrorManagementMiddleware, createNewBlog); //auth guarded
 
-blogsRouter.get('/:blogId/posts', validateBlogId, inputPaginationValidator2(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPostsFromBlog);
-blogsRouter.post('/:blogId/posts', superAdminGuardMiddleware, validateBlogId2, blogRoutesPostInputModelValidation, inputErrorManagementMiddleware, createNewBlogPost);
+blogsRouter.get('/:blogId/posts', validateBlogIdForSeveralPostsGetterEndpoint, inputPaginationValidator2(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPostsFromBlog);
+blogsRouter.post('/:blogId/posts', superAdminGuardMiddleware, validateBlogIdForBlogPostCreationEndpoint, blogRoutesPostInputModelValidation, inputErrorManagementMiddleware, createNewBlogPost);
 
-blogsRouter.get('/:id', validateBlogId3, inputErrorManagementMiddleware, findSingleBlog);
-blogsRouter.put('/:id', superAdminGuardMiddleware, validateBlogId3, blogInputModelValidation, inputErrorManagementMiddleware, updateBlog); //auth guarded
-blogsRouter.delete('/:id', superAdminGuardMiddleware, validateBlogId3, inputErrorManagementMiddleware, deleteBlog); //auth guarded
+blogsRouter.get('/:id', validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, findSingleBlog);
+blogsRouter.put('/:id', superAdminGuardMiddleware, validateBlogIdForGeneralCRUDEndpoints, blogInputModelValidation, inputErrorManagementMiddleware, updateBlog); //auth guarded
+blogsRouter.delete('/:id', superAdminGuardMiddleware, validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, deleteBlog); //auth guarded
 
 
 

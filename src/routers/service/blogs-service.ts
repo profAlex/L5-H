@@ -1,13 +1,13 @@
-import {CustomSortDirection} from "../routers/util-enums/sort-direction";
+import {CustomSortDirection} from "../util-enums/sort-direction";
 import {Request, Response} from "express";
-import {InputGetBlogsQuery} from "../routers/router-types/blog-search-input-model";
+import {InputGetBlogsQuery} from "../router-types/blog-search-input-model";
 import {WithId} from "mongodb";
-import {BlogViewModel} from "../routers/router-types/blog-view-model";
-import {dataRepository} from "../repository/blogger-mongodb-repository";
-import {InputGetBlogPostsByIdQuery} from "../routers/router-types/blog-search-by-id-input-model";
-import {PostViewModel} from "../routers/router-types/post-view-model";
-import {BlogInputModel} from "../routers/router-types/blog-input-model";
-import {PostInputModel} from "../routers/router-types/post-input-model";
+import {BlogViewModel} from "../router-types/blog-view-model";
+import {dataRepository} from "../../repository/blogger-mongodb-repository";
+import {InputGetBlogPostsByIdQuery} from "../router-types/blog-search-by-id-input-model";
+import {PostViewModel} from "../router-types/post-view-model";
+import {BlogInputModel} from "../router-types/blog-input-model";
+import {PostInputModel} from "../router-types/post-input-model";
 
 
 

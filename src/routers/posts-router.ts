@@ -10,7 +10,7 @@ import {
 import {postInputModelValidation} from "../validation/PostInputModel-validation-middleware";
 import {inputErrorManagementMiddleware} from "../validation/error-management-validation-middleware";
 import {superAdminGuardMiddleware} from "../validation/base64-auth-guard_middleware";
-import {IdParamName} from "./blogs-router";
+import {IdParamName} from "./util-enums/id-names";
 import {CollectionNames} from "../repository/collection-names";
 import {createIdValidator} from "../validation/id-verification-and-validation";
 import {inputPaginationValidator2} from "./blogs-validation-middleware/blog-pagination-validator";
@@ -18,13 +18,13 @@ import {PostsSortListEnum} from "./util-enums/fields-for-sorting";
 
 export const postsRouter = Router();
 
-const validateBlogId4 = createIdValidator({
+const validatePostId = createIdValidator({
     paramKey: IdParamName.Id,
     collectionName: CollectionNames.Posts,
 });
 
 postsRouter.get('/', inputPaginationValidator2(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPosts);
 postsRouter.post('/', superAdminGuardMiddleware, postInputModelValidation, inputErrorManagementMiddleware, createNewPost); //auth guarded
-postsRouter.get('/:id', validateBlogId4, inputErrorManagementMiddleware, findSinglePost);
-postsRouter.put('/:id', superAdminGuardMiddleware, validateBlogId4, /*inputErrorManagementMiddleware,*/ postInputModelValidation, inputErrorManagementMiddleware, updatePost); //auth guarded
-postsRouter.delete('/:id', superAdminGuardMiddleware, validateBlogId4, inputErrorManagementMiddleware, deletePost) //auth guarded
+postsRouter.get('/:id', validatePostId, inputErrorManagementMiddleware, findSinglePost);
+postsRouter.put('/:id', superAdminGuardMiddleware, validatePostId, /*inputErrorManagementMiddleware,*/ postInputModelValidation, inputErrorManagementMiddleware, updatePost); //auth guarded
+postsRouter.delete('/:id', superAdminGuardMiddleware, validatePostId, inputErrorManagementMiddleware, deletePost) //auth guarded

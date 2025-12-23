@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../../core/http-statuses";
 import {dataRepository} from "../../repository/blogger-mongodb-repository";
-import {blogsService} from "../../service/blogs-service";
+import {blogsService} from "../service/blogs-service";
 import {InputGetBlogsQuery} from "../router-types/blog-search-input-model";
 import {matchedData} from "express-validator";
 import {PaginatedBlogViewModel} from "../router-types/blog-paginated-view-model";
@@ -9,7 +9,7 @@ import {BlogViewModel} from "../router-types/blog-view-model";
 import {WithId} from "mongodb";
 import {mapToBlogListPaginatedOutput, mapToPostListPaginatedOutput} from "../mappers/map-blog-search-to-view-model";
 import {InputGetBlogPostsByIdQuery} from "../router-types/blog-search-by-id-input-model";
-import {postsService} from "../../service/posts-service";
+import {postsService} from "../service/posts-service";
 
 
 export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuery>, res: Response) => {

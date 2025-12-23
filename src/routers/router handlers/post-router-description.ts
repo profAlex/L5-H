@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../../core/http-statuses";
 import {dataRepository} from "../../repository/blogger-mongodb-repository";
-import {postsService} from "../../service/posts-service";
+import {postsService} from "../service/posts-service";
 import {InputGetPostsQuery} from "../router-types/post-search-input-model";
 import {matchedData} from "express-validator";
 import {BlogViewModel} from "../router-types/blog-view-model";

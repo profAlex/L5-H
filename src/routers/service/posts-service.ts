@@ -1,7 +1,7 @@
-import {dataRepository, postCollectionStorageModel} from "../repository/blogger-mongodb-repository";
-import {PostViewModel} from "../routers/router-types/post-view-model";
-import {PostInputModel} from "../routers/router-types/post-input-model";
-import {InputGetPostsQuery} from "../routers/router-types/post-search-input-model";
+import {dataRepository, postCollectionStorageModel} from "../../repository/blogger-mongodb-repository";
+import {PostViewModel} from "../router-types/post-view-model";
+import {PostInputModel} from "../router-types/post-input-model";
+import {InputGetPostsQuery} from "../router-types/post-search-input-model";
 import {WithId} from "mongodb";
 
 export const postsService = {
