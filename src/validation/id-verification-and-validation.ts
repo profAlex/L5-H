@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction, json} from "express";
-import {Db, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {HttpStatus} from "../core/http-statuses";
-import {db, postsCollection, bloggersCollection} from "../db/mongo.db";
+import {postsCollection, bloggersCollection} from "../db/mongo.db";
 
 
 
@@ -19,12 +19,8 @@ type IdValidatorConfig<ParamKey extends string> = {
     collectionName: string;
 };
 
-export function createIdValidator<
-    ParamKey extends string,
-    Query = any
->(
-    config: IdValidatorConfig<ParamKey>
-) {
+export function createIdValidator<ParamKey extends string, Query = any>
+(config: IdValidatorConfig<ParamKey>) {
     return async (
         req: IdValidatorRequest<ParamKey, Query>,
         res: Response,
