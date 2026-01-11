@@ -1,5 +1,5 @@
 import express, { Request, Response, Express } from 'express';
-import {AUTH_PATH, BLOGS_PATH, POSTS_PATH, TESTING_PATH, USERS_PATH} from "./routers/router-pathes";
+import {AUTH_PATH, BLOGS_PATH, POSTS_PATH, TESTING_PATH, USERS_PATH} from "./routers/pathes/router-pathes";
 import {blogsRouter} from "./routers/blogs-router";
 import {postsRouter} from "./routers/posts-router";
 import {testingRouter} from "./routers/testing-router";

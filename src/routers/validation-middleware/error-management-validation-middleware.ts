@@ -1,4 +1,4 @@
-import { HttpStatus } from "../core/http-statuses";
+import { HttpStatus } from "../util-enums/http-statuses";
 import { NextFunction, Request, Response } from 'express';
 import { FieldValidationError, ValidationError, validationResult } from 'express-validator';
 

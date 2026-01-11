@@ -1,8 +1,5 @@
 import {body} from "express-validator";
 
-// const keyParamsAmountValidation = body().custom((bodyData)=>{
-//         return Object.keys(bodyData).length === 3;
-//     }).withMessage("Amount of parameters of input blog entry is not sufficient or exceeds the required amount")
 
 const nameValidation = body('name')
     .exists().withMessage('Field name must be specified')
@@ -24,13 +21,16 @@ const websiteUrlValidation = body('websiteUrl')
     .matches('^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$').withMessage('Field websiteUrl contains inappropriate web site');
 
 export const blogInputModelValidation = [
-    //keyParamsAmountValidation,
     nameValidation,
     descriptionValidation,
     websiteUrlValidation,
 ];
 
 
+
+// const keyParamsAmountValidation = body().custom((bodyData)=>{
+//         return Object.keys(bodyData).length === 3;
+//     }).withMessage("Amount of parameters of input entry is not sufficient or exceeds the required amount")
 //
 // const phoneNumberValidation = body("phoneNumber")
 //     .exists().withMessage("Phone number must be specified")
@@ -92,6 +92,7 @@ export const blogInputModelValidation = [
 //     });
 //
 // export const driverInputDtoValidation = [
+//     keyParamsAmountValidation,
 //     nameValidation,
 //     phoneNumberValidation,
 //     emailValidation,

@@ -5,23 +5,23 @@ import {
     findSingleBlog,
     getSeveralBlogs, getSeveralPostsFromBlog,
     updateBlog
-} from "./router handlers/blog-router-description";
-import {blogInputModelValidation} from "../validation/BlogInputModel-validation-middleware";
-import {inputErrorManagementMiddleware} from "../validation/error-management-validation-middleware";
-import {superAdminGuardMiddleware} from "../validation/base64-auth-guard_middleware";
+} from "./router-handlers/blog-router-description";
+import {blogInputModelValidation} from "./validation-middleware/BlogInputModel-validation-middleware";
+import {inputErrorManagementMiddleware} from "./validation-middleware/error-management-validation-middleware";
+import {superAdminGuardMiddleware} from "./validation-middleware/base64-auth-guard_middleware";
 import {BlogsSortListEnum, PostsSortListEnum} from "./util-enums/fields-for-sorting";
 import {
-    inputPaginationValidator,
-    inputPaginationValidator2
-} from "./blogs-validation-middleware/blog-pagination-validator";
+    inputPaginationValidatorForBlogs,
+    inputPaginationValidatorForPosts
+} from "./validation-middleware/pagination-validators";
 import {
     blogRoutesPostInputModelValidation,
     postInputModelValidation
-} from "../validation/PostInputModel-validation-middleware";
-import {CollectionNames} from "../repository/collection-names";
+} from "./validation-middleware/PostInputModel-validation-middleware";
+import {CollectionNames} from "../db/collection-names";
 import {
     createIdValidator,
-} from "../validation/id-verification-and-validation";
+} from "./validation-middleware/id-verification-and-validation";
 import {InputGetBlogPostsByIdQuery} from "./router-types/blog-search-by-id-input-model";
 import {IdParamName} from "./util-enums/id-names";
 
@@ -43,10 +43,10 @@ const validateBlogIdForGeneralCRUDEndpoints = createIdValidator({
 });
 
 
-blogsRouter.get('/', inputPaginationValidator(BlogsSortListEnum), inputErrorManagementMiddleware, getSeveralBlogs);
+blogsRouter.get('/', inputPaginationValidatorForBlogs(BlogsSortListEnum), inputErrorManagementMiddleware, getSeveralBlogs);
 blogsRouter.post('/', superAdminGuardMiddleware, blogInputModelValidation, inputErrorManagementMiddleware, createNewBlog); //auth guarded
 
-blogsRouter.get('/:blogId/posts', validateBlogIdForSeveralPostsGetterEndpoint, inputPaginationValidator2(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPostsFromBlog);
+blogsRouter.get('/:blogId/posts', validateBlogIdForSeveralPostsGetterEndpoint, inputPaginationValidatorForPosts(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPostsFromBlog);
 blogsRouter.post('/:blogId/posts', superAdminGuardMiddleware, validateBlogIdForBlogPostCreationEndpoint, blogRoutesPostInputModelValidation, inputErrorManagementMiddleware, createNewBlogPost);
 
 blogsRouter.get('/:id', validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, findSingleBlog);

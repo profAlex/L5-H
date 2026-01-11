@@ -7,6 +7,8 @@ import {ObjectId, WithId} from "mongodb";
 import {InputGetBlogsQuery} from "../routers/router-types/blog-search-input-model";
 import {InputGetBlogPostsByIdQuery} from "../routers/router-types/blog-search-by-id-input-model";
 import {BlogPostInputModel} from "../routers/router-types/blog-post-input-model";
+import {mapSingleBloggerCollectionToViewModel} from "./map-to-BlogViewModel";
+import {mapSinglePostCollectionToViewModel} from "./map-to-PostViewModel";
 
 
 export type bloggerCollectionStorageModel= {
@@ -29,8 +31,6 @@ export type postCollectionStorageModel = {
     blogName: string;
     createdAt: Date;
 };
-
-//bloggerPosts: PostViewModel[] | null | undefined;
 
 // const __nonDisclosableDatabase = {
 //     bloggerRepository: [{
@@ -86,8 +86,6 @@ export type postCollectionStorageModel = {
 //             }]
 //         }
 //     ]
-
-
 
 // const bloggerInfo: bloggerCollectionStorageModel[] = [
 //     {
@@ -148,37 +146,6 @@ export type postCollectionStorageModel = {
 //     }
 // ];
 
-// пока не используем
-const generateCombinedId = () => {
-    const timestamp = Date.now();
-    const random = Math.random().toString().substring(2,5);
-    return `${timestamp}-${random}`;
-};
-
-const transformSingleBloggerCollectionToViewModel = (blogInContainer: bloggerCollectionStorageModel) => {
-    return {
-        id: blogInContainer._id.toString(),
-        name: blogInContainer.name,
-        description: blogInContainer.description,
-        websiteUrl: blogInContainer.websiteUrl,
-        createdAt: blogInContainer.createdAt,
-        isMembership: false // был false
-    } as BlogViewModel;
-};
-
-const transformSinglePostCollectionToViewModel = (postInContainer: postCollectionStorageModel) => {
-    return {
-        id: postInContainer._id.toString(),
-        title: postInContainer.title,
-        shortDescription: postInContainer.shortDescription,
-        content: postInContainer.content,
-        blogId: postInContainer.blogId,
-        blogName: postInContainer.blogName,
-        createdAt: postInContainer.createdAt
-    } as PostViewModel;
-};
-
-
 async function findBlogByPrimaryKey(id: ObjectId): Promise<bloggerCollectionStorageModel | null> {
     return bloggersCollection.findOne({ _id: id });
 }
@@ -204,14 +171,6 @@ export const dataRepository = {
 
         let filter :any = {};
         const skip = (pageNumber - 1) * pageSize;
-
-        // _id: ObjectId,
-        // id: string;
-        // name: string;
-        // description: string;
-        // websiteUrl: string;
-        // createdAt: Date;
-        // isMembership: boolean;
 
         try{
 
@@ -272,7 +231,7 @@ export const dataRepository = {
 
         await bloggersCollection.insertOne(newBlogEntry);
 
-        return transformSingleBloggerCollectionToViewModel(newBlogEntry);
+        return mapSingleBloggerCollectionToViewModel(newBlogEntry);
     },
 
 
@@ -328,7 +287,7 @@ export const dataRepository = {
 
                 // console.log("ID inside finding function:", foundBlogger.id);
 
-                return transformSingleBloggerCollectionToViewModel(blogger);
+                return mapSingleBloggerCollectionToViewModel(blogger);
             }
         }
 
@@ -492,7 +451,7 @@ export const dataRepository = {
 
                     await postsCollection.insertOne(newPostEntry);
 
-                    return transformSinglePostCollectionToViewModel(newPostEntry);
+                    return mapSinglePostCollectionToViewModel(newPostEntry);
                 }
             }
         }
@@ -528,7 +487,7 @@ export const dataRepository = {
 
                     //const propertyCount = Object.keys(newPostEntry).length;
                     //console.log("LOOK HERE ------>", propertyCount);
-                    return transformSinglePostCollectionToViewModel(newPostEntry);
+                    return mapSinglePostCollectionToViewModel(newPostEntry);
 
                     // return test;
 
@@ -552,7 +511,7 @@ export const dataRepository = {
 
             if(post)
             {
-                return transformSinglePostCollectionToViewModel(post);
+                return mapSinglePostCollectionToViewModel(post);
             }
         }
 

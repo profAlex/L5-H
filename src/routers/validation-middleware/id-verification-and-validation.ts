@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction, json} from "express";
 import {ObjectId} from "mongodb";
-import {HttpStatus} from "../core/http-statuses";
-import {postsCollection, bloggersCollection} from "../db/mongo.db";
+import {HttpStatus} from "../util-enums/http-statuses";
+import {postsCollection, bloggersCollection} from "../../db/mongo.db";
 
 
 

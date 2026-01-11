@@ -5,15 +5,15 @@ import {
     findSinglePost,
     getSeveralPosts,
     updatePost
-} from "./router handlers/post-router-description";
+} from "./router-handlers/post-router-description";
 
-import {postInputModelValidation} from "../validation/PostInputModel-validation-middleware";
-import {inputErrorManagementMiddleware} from "../validation/error-management-validation-middleware";
-import {superAdminGuardMiddleware} from "../validation/base64-auth-guard_middleware";
+import {postInputModelValidation} from "./validation-middleware/PostInputModel-validation-middleware";
+import {inputErrorManagementMiddleware} from "./validation-middleware/error-management-validation-middleware";
+import {superAdminGuardMiddleware} from "./validation-middleware/base64-auth-guard_middleware";
 import {IdParamName} from "./util-enums/id-names";
-import {CollectionNames} from "../repository/collection-names";
-import {createIdValidator} from "../validation/id-verification-and-validation";
-import {inputPaginationValidator2} from "./blogs-validation-middleware/blog-pagination-validator";
+import {CollectionNames} from "../db/collection-names";
+import {createIdValidator} from "./validation-middleware/id-verification-and-validation";
+import {inputPaginationValidatorForPosts} from "./validation-middleware/pagination-validators";
 import {PostsSortListEnum} from "./util-enums/fields-for-sorting";
 
 export const postsRouter = Router();
@@ -23,7 +23,7 @@ const validatePostId = createIdValidator({
     collectionName: CollectionNames.Posts,
 });
 
-postsRouter.get('/', inputPaginationValidator2(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPosts);
+postsRouter.get('/', inputPaginationValidatorForPosts(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPosts);
 postsRouter.post('/', superAdminGuardMiddleware, postInputModelValidation, inputErrorManagementMiddleware, createNewPost); //auth guarded
 postsRouter.get('/:id', validatePostId, inputErrorManagementMiddleware, findSinglePost);
 postsRouter.put('/:id', superAdminGuardMiddleware, validatePostId, /*inputErrorManagementMiddleware,*/ postInputModelValidation, inputErrorManagementMiddleware, updatePost); //auth guarded

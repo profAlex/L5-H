@@ -1,6 +1,6 @@
 import {query, ValidationChain} from "express-validator";
 import {CustomSortDirection} from "../util-enums/sort-direction";
-import {customErrorInQueryMessage} from "../../validation/error-handling-helpers";
+import {customErrorInQueryMessage} from "./error-handling-helpers";
 
 
 const DEFAULT_PAGE_NUMBER = 1;
@@ -8,7 +8,7 @@ const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_SORT_BY = 'createdAt';
 const DEFAULT_SORT_DIRECTION = CustomSortDirection.Descending;
 
-export function inputPaginationValidator<T extends string>(
+export function inputPaginationValidatorForBlogs<T extends string>(
     sentListOfAllowedFields: Record<string, T>
 ) :ValidationChain[] {
 
@@ -50,7 +50,7 @@ export function inputPaginationValidator<T extends string>(
 }
 
 
-export function inputPaginationValidator2<T extends string>(
+export function inputPaginationValidatorForPosts<T extends string>(
     sentListOfAllowedFields: Record<string, T>
 ) :ValidationChain[] {
 
