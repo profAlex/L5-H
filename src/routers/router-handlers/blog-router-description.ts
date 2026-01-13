@@ -27,6 +27,14 @@ export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuer
 
 
 export const createNewBlog = async (req: Request, res: Response) => {
+
+    const insertedId = await blogsService.createNewBlog(req.body);
+
+    if(insertedId){
+        // здесь идем в query repo с айдишником который нам вернул command repo
+
+    }
+
     res.status(HttpStatus.Created).json(await blogsService.createNewBlog(req.body));
 };
 

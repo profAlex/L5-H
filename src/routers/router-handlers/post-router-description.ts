@@ -1,20 +1,11 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../util-enums/http-statuses";
-import {dataCommandRepository} from "../../repository-layers/command-repository-layer/command-repository";
 import {postsService} from "../../service-layer(BLL)/posts-service";
 import {InputGetPostsQuery} from "../router-types/post-search-input-model";
 import {matchedData} from "express-validator";
-import {BlogViewModel} from "../router-types/blog-view-model";
-import {PostViewModel} from "../router-types/post-view-model";
-import {WithId} from "mongodb";
-import {PaginatedPostViewModel} from "../router-types/post-paginated-view-model";
-import {mapToPostListPaginatedOutput} from "../../repository-layers/mappers/map-blog-search-to-view-model";
+import {dataQueryRepository} from "../../repository-layers/query-repository-layer/query-repository";
 
 
-
-// export const getAllPosts= async (req:Request, res:Response) => {
-//     res.status(HttpStatus.Ok).json(await postsService.getAllPosts());
-// };
 
 export const getSeveralPosts= async (req:Request<any, any, any, InputGetPostsQuery >, res:Response) => {
     const sanitizedQuery = matchedData<InputGetPostsQuery>(req, {
@@ -23,13 +14,7 @@ export const getSeveralPosts= async (req:Request<any, any, any, InputGetPostsQue
     }); //утилита для извечения трансформированных значений после валидатара
     //в req.query остаются сырые квери параметры (строки)
 
-    const {items, totalCount} = await postsService.getSeveralPosts(sanitizedQuery);
-
-    const postsListOutput: PaginatedPostViewModel = mapToPostListPaginatedOutput(items, {
-        pageNumber: sanitizedQuery.pageNumber,
-        pageSize: sanitizedQuery.pageSize,
-        totalCount,
-    });
+    const postsListOutput = await dataQueryRepository.getSeveralPosts(sanitizedQuery);
 
     res.status(HttpStatus.Ok).send(postsListOutput);
 };
@@ -37,22 +22,13 @@ export const getSeveralPosts= async (req:Request<any, any, any, InputGetPostsQue
 export const createNewPost= async (req:Request, res:Response) => {
     const result = await postsService.createNewPost(req.body)
 
-    // if(result === undefined)
-    // {
-    //     // res.sendStatus(HttpStatus.NotFound);
-    //
-    //     res.status(HttpStatus.Created).json({ errorsMessages: "this is what ive been trying to find" });
-    //
-    //     throw new Error(`couldn't create new post inside postsService.createNewPost`);
-    // }
-
     res.status(HttpStatus.Created).json(result);
 };
 
 
 
 export const findSinglePost= async (req:Request, res:Response) => {
-    const result = await postsService.findSinglePost(req.params.id);
+    const result = await dataQueryRepository.findSinglePost(req.params.id);
 
     if(result === undefined)
     {

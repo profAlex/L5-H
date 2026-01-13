@@ -9,6 +9,7 @@ import {InputGetBlogPostsByIdQuery} from "../../routers/router-types/blog-search
 import {BlogPostInputModel} from "../../routers/router-types/blog-post-input-model";
 import {mapSingleBloggerCollectionToViewModel} from "../mappers/map-to-BlogViewModel";
 import {mapSinglePostCollectionToViewModel} from "../mappers/map-to-PostViewModel";
+import {CustomValidationError} from "../../routers/validation-middleware/error-management-validation-middleware";
 
 
 export type bloggerCollectionStorageModel= {
@@ -219,19 +220,53 @@ export const dataCommandRepository = {
     // },
 
 
-    async createNewBlog(newBlog: BlogInputModel): Promise <BlogViewModel> {
-        const tempId = new ObjectId();
-        const newBlogEntry = {
-            _id: tempId,
-            id: tempId.toString(),
-            ...newBlog,
-            createdAt: new Date(),
-            isMembership: false
-        } as bloggerCollectionStorageModel;
+    async createNewBlog(newBlog: BlogInputModel): Promise <string | undefined> {
+        try {
+            const tempId = new ObjectId();
+            const newBlogEntry = {
+                _id: tempId,
+                id: tempId.toString(),
+                ...newBlog,
+                createdAt: new Date(),
+                isMembership: false
+            } as bloggerCollectionStorageModel;
 
-        await bloggersCollection.insertOne(newBlogEntry);
 
-        return mapSingleBloggerCollectionToViewModel(newBlogEntry);
+            const result = await bloggersCollection.insertOne(newBlogEntry);
+
+            if (!result.acknowledged)
+            {
+                throw new CustomValidationError({
+                    errorMessage: { field: 'bloggersCollection.insertOne(newBlogEntry)', message: 'attempt to insert new blog entry failed' }
+                });
+            }
+
+            // return mapSingleBloggerCollectionToViewModel(newBlogEntry);
+            return result.insertedId.toString();
+        }
+        catch (error) {
+            if(error instanceof CustomValidationError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error`);
+                }
+
+                // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+            }
+        }
+
+
     },
 
 
@@ -352,17 +387,6 @@ export const dataCommandRepository = {
         }
 
         return undefined;
-        // const blogger = __nonDisclosableDatabase.bloggerRepository.find((blogger) => blogger.bloggerInfo.id === blogId);
-
-        // if(blogger)
-        // {
-        //     let blogIndex = __nonDisclosableDatabase.bloggerRepository.indexOf(blogger);
-        //     __nonDisclosableDatabase.bloggerRepository.splice(blogIndex, 1);
-        //
-        //     return null;
-        // }
-        //
-        // return undefined;
     },
 
     // *****************************
@@ -396,39 +420,39 @@ export const dataCommandRepository = {
     },
 
 
-    async getSeveralPosts(sentSanitizedQuery: InputGetBlogPostsByIdQuery) : Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
-        const {
-            sortBy,
-            sortDirection,
-            pageNumber,
-            pageSize,
-        } = sentSanitizedQuery;
-
-        const skip = (pageNumber - 1) * pageSize;
-
-        if(!sortBy) {
-            console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPosts");
-            throw new Error();
-        }
-
-        const items = await postsCollection
-            .find({})
-
-            // "asc" (по возрастанию), то используется 1
-            // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
-            .sort({[sortBy]: sortDirection})
-
-            // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
-            .skip(skip)
-
-            // ограничивает количество возвращаемых документов до значения pageSize
-            .limit(pageSize)
-            .toArray();
-
-        const totalCount = await postsCollection.countDocuments({});
-
-        return {items, totalCount};
-    },
+    // async getSeveralPosts(sentSanitizedQuery: InputGetBlogPostsByIdQuery) : Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
+    //     const {
+    //         sortBy,
+    //         sortDirection,
+    //         pageNumber,
+    //         pageSize,
+    //     } = sentSanitizedQuery;
+    //
+    //     const skip = (pageNumber - 1) * pageSize;
+    //
+    //     if(!sortBy) {
+    //         console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPosts");
+    //         throw new Error();
+    //     }
+    //
+    //     const items = await postsCollection
+    //         .find({})
+    //
+    //         // "asc" (по возрастанию), то используется 1
+    //         // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
+    //         .sort({[sortBy]: sortDirection})
+    //
+    //         // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
+    //         .skip(skip)
+    //
+    //         // ограничивает количество возвращаемых документов до значения pageSize
+    //         .limit(pageSize)
+    //         .toArray();
+    //
+    //     const totalCount = await postsCollection.countDocuments({});
+    //
+    //     return {items, totalCount};
+    // },
 
 
     async createNewPost(newPost: PostInputModel): Promise<PostViewModel | undefined> {
@@ -497,20 +521,19 @@ export const dataCommandRepository = {
     },
 
 
-    async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
-        if (ObjectId.isValid(postId)) {
-
-            //А если ключ существует надо ли делат проверку ша if(post) ?
-            const post: postCollectionStorageModel | null = await findPostByPrimaryKey(new ObjectId(postId));
-
-            if(post)
-            {
-                return mapSinglePostCollectionToViewModel(post);
-            }
-        }
-
-        return undefined;
-    },
+    // async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
+    //     if (ObjectId.isValid(postId)) {
+    //
+    //         const post: postCollectionStorageModel | null = await findPostByPrimaryKey(new ObjectId(postId));
+    //
+    //         if(post)
+    //         {
+    //             return mapSinglePostCollectionToViewModel(post);
+    //         }
+    //     }
+    //
+    //     return undefined;
+    // },
 
 
     async updatePost(postId: string, newData: PostInputModel): Promise<null | undefined> {

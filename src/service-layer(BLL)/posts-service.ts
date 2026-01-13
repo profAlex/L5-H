@@ -10,30 +10,19 @@ export const postsService = {
     //     return await dataRepository.getAllPosts();
     // },
 
-
-    async getSeveralPosts(sentInputGetPostsQuery: InputGetPostsQuery): Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
-
-        return await dataCommandRepository.getSeveralPosts(sentInputGetPostsQuery);
-    },
+    // async getSeveralPosts(sentInputGetPostsQuery: InputGetPostsQuery): Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
+    //
+    //     return await dataCommandRepository.getSeveralPosts(sentInputGetPostsQuery);
+    // },
 
     async createNewPost(newPost: PostInputModel): Promise<PostViewModel | undefined> {
-        const result = await dataCommandRepository.createNewPost(newPost);
 
-        // if(result === undefined)
-        // {
-        //     // res.sendStatus(HttpStatus.NotFound);
-        //     console.error("Error creating new post");
-        //     throw new Error(`couldn't create new post inside dataRepository.createNewPost`);
-        // }
-
-        return result;
+        return await dataCommandRepository.createNewPost(newPost);
     },
 
-
-
-    async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
-        return await dataCommandRepository.findSinglePost(postId);
-    },
+    // async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
+    //     return await dataCommandRepository.findSinglePost(postId);
+    // },
 
     async updatePost(postId: string, newData: PostInputModel) {
         return await dataCommandRepository.updatePost(postId, newData);

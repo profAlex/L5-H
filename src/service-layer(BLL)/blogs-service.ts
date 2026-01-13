@@ -1,7 +1,7 @@
 import {CustomSortDirection} from "../routers/util-enums/sort-direction";
 import {Request, Response} from "express";
 import {InputGetBlogsQuery} from "../routers/router-types/blog-search-input-model";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {BlogViewModel} from "../routers/router-types/blog-view-model";
 import {dataCommandRepository} from "../repository-layers/command-repository-layer/command-repository";
 import {InputGetBlogPostsByIdQuery} from "../routers/router-types/blog-search-by-id-input-model";
@@ -19,7 +19,7 @@ export const blogsService = {
     //     return await dataCommandRepository.getSeveralBlogs(sentInputGetBlogsQuery);
     // },
 
-    async createNewBlog(newBlog: BlogInputModel) {
+    async createNewBlog(newBlog: BlogInputModel) : Promise<string | undefined> {
 
         return await dataCommandRepository.createNewBlog(newBlog);
     },
