@@ -1,15 +1,16 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../util-enums/http-statuses";
-import {dataRepository} from "../../repository-layer/blogger-mongodb-repository";
+import {dataCommandRepository} from "../../repository-layers/command-repository-layer/command-repository";
 import {blogsService} from "../../service-layer(BLL)/blogs-service";
 import {InputGetBlogsQuery} from "../router-types/blog-search-input-model";
 import {matchedData} from "express-validator";
 import {PaginatedBlogViewModel} from "../router-types/blog-paginated-view-model";
 import {BlogViewModel} from "../router-types/blog-view-model";
 import {WithId} from "mongodb";
-import {mapToBlogListPaginatedOutput, mapToPostListPaginatedOutput} from "../mappers/map-blog-search-to-view-model";
+import {mapToBlogListPaginatedOutput, mapToPostListPaginatedOutput} from "../../repository-layers/mappers/map-blog-search-to-view-model";
 import {InputGetBlogPostsByIdQuery} from "../router-types/blog-search-by-id-input-model";
 import {postsService} from "../../service-layer(BLL)/posts-service";
+import {dataQueryRepository} from "../../repository-layers/query-repository-layer/query-repository";
 
 
 export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuery>, res: Response) => {
@@ -19,13 +20,7 @@ export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuer
     }); //утилита для извечения трансформированных значений после валидатара
     //в req.query остаются сырые квери параметры (строки)
 
-    const {items, totalCount} = await blogsService.getSeveralBlogs(sanitizedQuery);
-
-    const driversListOutput = mapToBlogListPaginatedOutput(items, {
-        pageNumber: sanitizedQuery.pageNumber,
-        pageSize: sanitizedQuery.pageSize,
-        totalCount,
-    });
+    const driversListOutput = await dataQueryRepository.getSeveralBlogs(sanitizedQuery);
 
     res.status(HttpStatus.Ok).send(driversListOutput);
 };
@@ -34,8 +29,6 @@ export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuer
 export const createNewBlog = async (req: Request, res: Response) => {
     res.status(HttpStatus.Created).json(await blogsService.createNewBlog(req.body));
 };
-
-
 
 export const getSeveralPostsFromBlog = async (req: Request<{blogId: string}, {}, {}, InputGetBlogPostsByIdQuery>, res: Response) => {
     const sanitizedQuery = matchedData<InputGetBlogPostsByIdQuery>(req, {
@@ -49,18 +42,7 @@ export const getSeveralPostsFromBlog = async (req: Request<{blogId: string}, {},
         res.status(400).json({ error: 'blogId is required' });
     }
 
-    // console.log('<------------ HAVE WE GOT HERE????');
-    // console.log(sanitizedQuery);
-    // console.log(blogId);
-
-
-    const {items, totalCount} = await blogsService.getAllPostsFromBlog(blogId, sanitizedQuery);
-
-    const postListOutput = mapToPostListPaginatedOutput(items, {
-        pageNumber: sanitizedQuery.pageNumber,
-        pageSize: sanitizedQuery.pageSize,
-        totalCount,
-    });
+    const postListOutput = await dataQueryRepository.getSeveralPostsById(blogId, sanitizedQuery);
 
     res.status(HttpStatus.Ok).send(postListOutput);
 };
@@ -69,21 +51,12 @@ export const getSeveralPostsFromBlog = async (req: Request<{blogId: string}, {},
 export const createNewBlogPost= async (req:Request, res:Response) => {
     const result = await blogsService.createNewBlogPost(req.params.blogId, req.body)
 
-    // if(result === undefined)
-    // {
-    //     // res.sendStatus(HttpStatus.NotFound);
-    //
-    //     res.status(HttpStatus.Created).json({ errorsMessages: "this is what ive been trying to find" });
-    //
-    //     throw new Error(`couldn't create new post inside postsService.createNewPost`);
-    // }
-
     res.status(HttpStatus.Created).json(result);
 };
 
 
 export const findSingleBlog = async (req: Request, res: Response) => {
-    const result = await blogsService.findSingleBlog(req.params.id);
+    const result = await dataQueryRepository.findSingleBlog(req.params.id);
 
     if(result === undefined)
     {

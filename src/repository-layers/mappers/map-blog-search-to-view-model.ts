@@ -1,8 +1,8 @@
-import {BlogViewModel} from "../router-types/blog-view-model";
+import {BlogViewModel} from "../../routers/router-types/blog-view-model";
 import {WithId} from "mongodb";
-import {PaginatedBlogViewModel} from "../router-types/blog-paginated-view-model";
-import {PostViewModel} from "../router-types/post-view-model";
-import {PaginatedPostViewModel} from "../router-types/post-paginated-view-model";
+import {PaginatedBlogViewModel} from "../../routers/router-types/blog-paginated-view-model";
+import {PostViewModel} from "../../routers/router-types/post-view-model";
+import {PaginatedPostViewModel} from "../../routers/router-types/post-paginated-view-model";
 
 
 export function mapToBlogListPaginatedOutput(

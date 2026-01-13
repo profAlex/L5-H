@@ -1,4 +1,4 @@
-import {dataRepository, postCollectionStorageModel} from "../repository-layer/blogger-mongodb-repository";
+import {dataCommandRepository, postCollectionStorageModel} from "../repository-layers/command-repository-layer/command-repository";
 import {PostViewModel} from "../routers/router-types/post-view-model";
 import {PostInputModel} from "../routers/router-types/post-input-model";
 import {InputGetPostsQuery} from "../routers/router-types/post-search-input-model";
@@ -13,11 +13,11 @@ export const postsService = {
 
     async getSeveralPosts(sentInputGetPostsQuery: InputGetPostsQuery): Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
 
-        return await dataRepository.getSeveralPosts(sentInputGetPostsQuery);
+        return await dataCommandRepository.getSeveralPosts(sentInputGetPostsQuery);
     },
 
     async createNewPost(newPost: PostInputModel): Promise<PostViewModel | undefined> {
-        const result = await dataRepository.createNewPost(newPost);
+        const result = await dataCommandRepository.createNewPost(newPost);
 
         // if(result === undefined)
         // {
@@ -32,14 +32,14 @@ export const postsService = {
 
 
     async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
-        return await dataRepository.findSinglePost(postId);
+        return await dataCommandRepository.findSinglePost(postId);
     },
 
     async updatePost(postId: string, newData: PostInputModel) {
-        return await dataRepository.updatePost(postId, newData);
+        return await dataCommandRepository.updatePost(postId, newData);
     },
 
     async deletePost (postId: string): Promise<null | undefined> {
-        return await dataRepository.deletePost(postId);
+        return await dataCommandRepository.deletePost(postId);
     },
     }

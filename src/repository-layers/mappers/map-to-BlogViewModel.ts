@@ -1,5 +1,5 @@
-import {BlogViewModel} from "../routers/router-types/blog-view-model";
-import {bloggerCollectionStorageModel} from "./blogger-mongodb-repository";
+import {BlogViewModel} from "../../routers/router-types/blog-view-model";
+import {bloggerCollectionStorageModel} from "../command-repository-layer/command-repository";
 
 export const mapSingleBloggerCollectionToViewModel = (blogInContainer: bloggerCollectionStorageModel) => {
     return {

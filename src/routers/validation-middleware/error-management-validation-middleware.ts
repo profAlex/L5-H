@@ -9,31 +9,37 @@ type ValidationErrorType = {
     field: string;
 };
 
-type MyCustomMsg = { message: string; field?: string };
-
 const formatErrors = (error: ValidationError): ValidationErrorType => {
-    // 1. Safe Type Guard (Best practice from previous answer)
-    if (error.type !== 'field') {
-        return { message: error.msg, field: 'general' };
-    }
+    // Проверяем, является ли ошибка FieldValidationError (path содержится только в FieldValidationError)
+    if ('path' in error) {
+        const fieldError = error as FieldValidationError;
 
-    const msg = error.msg as MyCustomMsg;
+        if (
+            typeof fieldError.msg === 'object' &&
+            fieldError.msg !== null &&
+            'message' in fieldError.msg &&
+            fieldError.msg.message != null
+        ) {
+            const customMsg = fieldError.msg as { message: string; field?: string };
+            return {
+                message: String(customMsg.message),
+                field: customMsg.field || fieldError.path || 'unknown'
+            };
+        }
 
-    // 2. Check if msg is our custom object
-    if (typeof msg === 'object' && msg !== null && 'message' in msg) {
         return {
-            message: msg.message,
-            // Use the field from the object if provided, otherwise fallback to express-validator's path
-            field: msg.field || error.path,
+            message: String(fieldError.msg),
+            field: fieldError.path || 'unknown'
         };
     }
 
-    // 3. Fallback for standard string messages
+    // Для других типов ошибок (AlternativeValidationError и т. п.)
     return {
-        message: String(msg),
-        field: error.path,
+        message: String(error.msg),
+        field: 'unknown' // или другое значение по умолчанию
     };
 };
+
 
 export const inputErrorManagementMiddleware = (
     req: Request<{},{},{},{}>,
@@ -43,8 +49,6 @@ export const inputErrorManagementMiddleware = (
     const errors = validationResult(req).formatWith(formatErrors).array({ onlyFirstError: true });
 
     if (errors.length > 0) {
-        // console.log("WE GOT HERE FOR SOME REASON??");
-        // console.log(errors); //для отладки, иначе непонятно где смотреть ошибки в случае их возникновения
         // if(errors[0].message.toLowerCase().includes('not found')) {
         //     // console.log(errors[0].message);
         //
@@ -60,7 +64,6 @@ export const inputErrorManagementMiddleware = (
 
         console.error(`Error ${HttpStatus.BadRequest}: ${errors[0].message}`);
         res.status(HttpStatus.BadRequest).json({ errorsMessages: errors });
-        //return;
     }
 
     next();

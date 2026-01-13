@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../util-enums/http-statuses";
-import {dataRepository} from "../../repository-layer/blogger-mongodb-repository";
+import {dataCommandRepository} from "../../repository-layers/command-repository-layer/command-repository";
 import {postsService} from "../../service-layer(BLL)/posts-service";
 import {InputGetPostsQuery} from "../router-types/post-search-input-model";
 import {matchedData} from "express-validator";
@@ -8,7 +8,7 @@ import {BlogViewModel} from "../router-types/blog-view-model";
 import {PostViewModel} from "../router-types/post-view-model";
 import {WithId} from "mongodb";
 import {PaginatedPostViewModel} from "../router-types/post-paginated-view-model";
-import {mapToPostListPaginatedOutput} from "../mappers/map-blog-search-to-view-model";
+import {mapToPostListPaginatedOutput} from "../../repository-layers/mappers/map-blog-search-to-view-model";
 
 
 

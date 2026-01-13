@@ -1,5 +1,5 @@
-import {PostViewModel} from "../routers/router-types/post-view-model";
-import {postCollectionStorageModel} from "./blogger-mongodb-repository";
+import {PostViewModel} from "../../routers/router-types/post-view-model";
+import {postCollectionStorageModel} from "../command-repository-layer/command-repository";
 
 export const mapSinglePostCollectionToViewModel = (postInContainer: postCollectionStorageModel) => {
     return {

@@ -1,14 +1,14 @@
-import {BlogViewModel} from "../routers/router-types/blog-view-model";
-import {BlogInputModel} from "../routers/router-types/blog-input-model";
-import {PostViewModel} from "../routers/router-types/post-view-model";
-import {PostInputModel} from "../routers/router-types/post-input-model";
-import {bloggersCollection, postsCollection} from "../db/mongo.db";
+import {BlogViewModel} from "../../routers/router-types/blog-view-model";
+import {BlogInputModel} from "../../routers/router-types/blog-input-model";
+import {PostViewModel} from "../../routers/router-types/post-view-model";
+import {PostInputModel} from "../../routers/router-types/post-input-model";
+import {bloggersCollection, postsCollection} from "../../db/mongo.db";
 import {ObjectId, WithId} from "mongodb";
-import {InputGetBlogsQuery} from "../routers/router-types/blog-search-input-model";
-import {InputGetBlogPostsByIdQuery} from "../routers/router-types/blog-search-by-id-input-model";
-import {BlogPostInputModel} from "../routers/router-types/blog-post-input-model";
-import {mapSingleBloggerCollectionToViewModel} from "./map-to-BlogViewModel";
-import {mapSinglePostCollectionToViewModel} from "./map-to-PostViewModel";
+import {InputGetBlogsQuery} from "../../routers/router-types/blog-search-input-model";
+import {InputGetBlogPostsByIdQuery} from "../../routers/router-types/blog-search-by-id-input-model";
+import {BlogPostInputModel} from "../../routers/router-types/blog-post-input-model";
+import {mapSingleBloggerCollectionToViewModel} from "../mappers/map-to-BlogViewModel";
+import {mapSinglePostCollectionToViewModel} from "../mappers/map-to-PostViewModel";
 
 
 export type bloggerCollectionStorageModel= {
@@ -156,67 +156,67 @@ async function findPostByPrimaryKey(id: ObjectId): Promise<postCollectionStorage
 }
 
 
-export const dataRepository = {
+export const dataCommandRepository = {
     // *****************************
     // методы для управления блогами
     // *****************************
-    async getSeveralBlogs(sentInputGetBlogsQuery: InputGetBlogsQuery) : Promise<{items: WithId<BlogViewModel>[]; totalCount: number}> {
-        const {
-            searchNameTerm,
-            sortBy,
-            sortDirection,
-            pageNumber,
-            pageSize,
-        } = sentInputGetBlogsQuery;
-
-        let filter :any = {};
-        const skip = (pageNumber - 1) * pageSize;
-
-        try{
-
-            if (searchNameTerm && searchNameTerm.trim() !== '') {
-                // Экранируем спецсимволы для безопасного $regex
-                const escapedTerm = searchNameTerm
-                    .trim()
-                    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-                filter = {
-                    $or: [
-                        { name: { $regex: escapedTerm, $options: 'i' } },
-                        { description: { $regex: escapedTerm, $options: 'i' } },
-                        { websiteUrl: { $regex: escapedTerm, $options: 'i' } },
-                    ],
-                };
-            }
-            // console.log("<---------------WE GOT HERE??? 4");
-        }
-        catch(err){
-            console.error("ERROR: ", err)
-        }
-
-        if(!sortBy) {
-            console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralBlogs");
-            throw new Error();
-        }
-
-        const items = await bloggersCollection
-            .find(filter)
-
-            // "asc" (по возрастанию), то используется 1
-            // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
-            .sort({[sortBy]: sortDirection})
-
-            // пропускаем определённое количество документов перед тем, как вернуть нужный набор данных.
-            .skip(skip)
-
-            // ограничивает количество возвращаемых документов до значения pageSize
-            .limit(pageSize)
-            .toArray();
-
-        const totalCount = await bloggersCollection.countDocuments(filter);
-
-        return {items, totalCount};
-    },
+    // перенесли в dataQueryRepository
+    // async getSeveralBlogs(sentInputGetBlogsQuery: InputGetBlogsQuery) : Promise<{items: WithId<BlogViewModel>[]; totalCount: number}> {
+    //     const {
+    //         searchNameTerm,
+    //         sortBy,
+    //         sortDirection,
+    //         pageNumber,
+    //         pageSize,
+    //     } = sentInputGetBlogsQuery;
+    //
+    //     let filter :any = {};
+    //     const skip = (pageNumber - 1) * pageSize;
+    //
+    //     try{
+    //
+    //         if (searchNameTerm && searchNameTerm.trim() !== '') {
+    //             // Экранируем спецсимволы для безопасного $regex
+    //             const escapedTerm = searchNameTerm
+    //                 .trim()
+    //                 .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    //
+    //             filter = {
+    //                 $or: [
+    //                     { name: { $regex: escapedTerm, $options: 'i' } },
+    //                     { description: { $regex: escapedTerm, $options: 'i' } },
+    //                     { websiteUrl: { $regex: escapedTerm, $options: 'i' } },
+    //                 ],
+    //             };
+    //         }
+    //     }
+    //     catch(err){
+    //         console.error("ERROR: ", err)
+    //     }
+    //
+    //     if(!sortBy) {
+    //         console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralBlogs");
+    //         throw new Error();
+    //     }
+    //
+    //     const items = await bloggersCollection
+    //         .find(filter)
+    //
+    //         // "asc" (по возрастанию), то используется 1
+    //         // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
+    //         .sort({[sortBy]: sortDirection})
+    //
+    //         // пропускаем определённое количество документов перед тем, как вернуть нужный набор данных.
+    //         .skip(skip)
+    //
+    //         // ограничивает количество возвращаемых документов до значения pageSize
+    //         .limit(pageSize)
+    //         .toArray();
+    //
+    //     const totalCount = await bloggersCollection.countDocuments(filter);
+    //
+    //     return {items, totalCount};
+    // },
 
 
     async createNewBlog(newBlog: BlogInputModel): Promise <BlogViewModel> {
@@ -235,64 +235,64 @@ export const dataRepository = {
     },
 
 
-    async getSeveralPostsById(sentBlogId:string, sentSanitizedQuery: InputGetBlogPostsByIdQuery) : Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
-        const {
-            sortBy,
-            sortDirection,
-            pageNumber,
-            pageSize,
-        } = sentSanitizedQuery;
+    // async getSeveralPostsById(sentBlogId:string, sentSanitizedQuery: InputGetBlogPostsByIdQuery) : Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
+    //     const {
+    //         sortBy,
+    //         sortDirection,
+    //         pageNumber,
+    //         pageSize,
+    //     } = sentSanitizedQuery;
+    //
+    //     const skip = (pageNumber - 1) * pageSize;
+    //
+    //     if(!sortBy) {
+    //         console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPostsById");
+    //         throw new Error();
+    //     }
+    //
+    //     const items = await postsCollection
+    //         .find({blogId: sentBlogId})
+    //
+    //         // "asc" (по возрастанию), то используется 1
+    //         // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
+    //         .sort({[sortBy]: sortDirection})
+    //
+    //         // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
+    //         .skip(skip)
+    //
+    //         // ограничивает количество возвращаемых документов до значения pageSize
+    //         .limit(pageSize)
+    //         .toArray();
+    //
+    //     const totalCount = await postsCollection.countDocuments({blogId: sentBlogId});
+    //
+    //     return {items, totalCount};
+    // },
+    //
 
-        const skip = (pageNumber - 1) * pageSize;
-
-        if(!sortBy) {
-            console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPostsById");
-            throw new Error();
-        }
-
-        const items = await postsCollection
-            .find({blogId: sentBlogId})
-
-            // "asc" (по возрастанию), то используется 1
-            // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
-            .sort({[sortBy]: sortDirection})
-
-            // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
-            .skip(skip)
-
-            // ограничивает количество возвращаемых документов до значения pageSize
-            .limit(pageSize)
-            .toArray();
-
-        const totalCount = await postsCollection.countDocuments({blogId: sentBlogId});
-
-        return {items, totalCount};
-    },
-
-
-    async findSingleBlog(blogId: string): Promise<BlogViewModel | undefined> {
-
-        if (ObjectId.isValid(blogId)) {
-
-            const blogger: bloggerCollectionStorageModel | null = await findBlogByPrimaryKey(new ObjectId(blogId));
-
-            if(blogger)
-            {
-                // const foundBlogger = {
-                //     id: blogger.bloggerInfo.id,
-                //     name: blogger.bloggerInfo.name,
-                //     description: blogger.bloggerInfo.description,
-                //     websiteUrl: blogger.bloggerInfo.websiteUrl
-                // }
-
-                // console.log("ID inside finding function:", foundBlogger.id);
-
-                return mapSingleBloggerCollectionToViewModel(blogger);
-            }
-        }
-
-        return undefined;
-    },
+    // async findSingleBlog(blogId: string): Promise<BlogViewModel | undefined> {
+    //
+    //     if (ObjectId.isValid(blogId)) {
+    //
+    //         const blogger: bloggerCollectionStorageModel | null = await findBlogByPrimaryKey(new ObjectId(blogId));
+    //
+    //         if(blogger)
+    //         {
+    //             // const foundBlogger = {
+    //             //     id: blogger.bloggerInfo.id,
+    //             //     name: blogger.bloggerInfo.name,
+    //             //     description: blogger.bloggerInfo.description,
+    //             //     websiteUrl: blogger.bloggerInfo.websiteUrl
+    //             // }
+    //
+    //             // console.log("ID inside finding function:", foundBlogger.id);
+    //
+    //             return mapSingleBloggerCollectionToViewModel(blogger);
+    //         }
+    //     }
+    //
+    //     return undefined;
+    // },
 
 
     async updateBlog(blogId: string, newData: BlogInputModel): Promise<null | undefined> {
@@ -436,15 +436,14 @@ export const dataRepository = {
 
             if (ObjectId.isValid(newPost.blogId))
             {
+                const relatedBlogger = await findBlogByPrimaryKey(new ObjectId(newPost.blogId));
                 const tempId = new ObjectId();
-                const relatedBlogger = await this.findSingleBlog(newPost.blogId);
 
                 if (relatedBlogger){
                     const newPostEntry = {
                         _id: tempId,
                         id: tempId.toString(),
                         ...newPost,
-                        //blogId: newPost.blogId,
                         blogName: relatedBlogger.name,
                         createdAt: new Date()
                     } as postCollectionStorageModel;
@@ -470,8 +469,8 @@ export const dataRepository = {
 
             if (ObjectId.isValid(sentBlogId))
             {
+                const relatedBlogger = await findBlogByPrimaryKey(new ObjectId(sentBlogId));
                 const tempId = new ObjectId();
-                const relatedBlogger = await this.findSingleBlog(sentBlogId);
 
                 if (relatedBlogger){
                     const newPostEntry = {
@@ -485,12 +484,7 @@ export const dataRepository = {
 
                     await postsCollection.insertOne(newPostEntry);
 
-                    //const propertyCount = Object.keys(newPostEntry).length;
-                    //console.log("LOOK HERE ------>", propertyCount);
                     return mapSinglePostCollectionToViewModel(newPostEntry);
-
-                    // return test;
-
                 }
             }
         }
