@@ -9,7 +9,7 @@ import {InputGetBlogPostsByIdQuery} from "../../routers/router-types/blog-search
 import {BlogPostInputModel} from "../../routers/router-types/blog-post-input-model";
 import {mapSingleBloggerCollectionToViewModel} from "../mappers/map-to-BlogViewModel";
 import {mapSinglePostCollectionToViewModel} from "../mappers/map-to-PostViewModel";
-import {CustomValidationError} from "../../routers/validation-middleware/error-management-validation-middleware";
+import {CustomError} from "../utility/custom-error-class";
 
 
 export type bloggerCollectionStorageModel= {
@@ -236,7 +236,7 @@ export const dataCommandRepository = {
 
             if (!result.acknowledged)
             {
-                throw new CustomValidationError({
+                throw new CustomError({
                     errorMessage: { field: 'bloggersCollection.insertOne(newBlogEntry)', message: 'attempt to insert new blog entry failed' }
                 });
             }
@@ -245,7 +245,7 @@ export const dataCommandRepository = {
             return result.insertedId.toString();
         }
         catch (error) {
-            if(error instanceof CustomValidationError) {
+            if(error instanceof CustomError) {
                 if(error.metaData)
                 {
                     const errorData = error.metaData.errorMessage;
@@ -253,7 +253,7 @@ export const dataCommandRepository = {
                 }
                 else
                 {
-                    console.error(`Unknown error`);
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
                 }
 
                 // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
@@ -455,6 +455,7 @@ export const dataCommandRepository = {
     // },
 
 
+    // ПРИВЕСТИ К ВИДУ КАК В ЗДЕСЬ ЖЕ ВЫШЕ, С ОБРАБОТКОЙ ОШИБОК!!!
     async createNewPost(newPost: PostInputModel): Promise<PostViewModel | undefined> {
         try {
 
@@ -488,7 +489,7 @@ export const dataCommandRepository = {
     },
 
 
-    async createNewBlogPost(sentBlogId: string, newPost: BlogPostInputModel): Promise<PostViewModel | undefined> {
+    async createNewBlogPost(sentBlogId: string, newPost: BlogPostInputModel): Promise<string | undefined> {
         try {
 
             if (ObjectId.isValid(sentBlogId))
@@ -506,18 +507,39 @@ export const dataCommandRepository = {
                         createdAt: new Date()
                     } as postCollectionStorageModel;
 
-                    await postsCollection.insertOne(newPostEntry);
+                    const result = await postsCollection.insertOne(newPostEntry);
+                    if (!result.acknowledged)
+                    {
+                        throw new CustomError({
+                            errorMessage: { field: 'postsCollection.insertOne(newPostEntry)', message: 'attempt to insert new post entry failed' }
+                        });
+                    }
 
-                    return mapSinglePostCollectionToViewModel(newPostEntry);
+                    return result.insertedId.toString();
                 }
             }
         }
-        catch(error) {
-            console.error("Unknown error inside dataRepository.createNewBlogPost: ", error);
-            throw new Error("Unknown error inside dataRepository.createNewBlogPost");
-        }
+        catch (error) {
+            if(error instanceof CustomError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                }
 
-        return undefined;
+                // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in createNewBlogPost method of dataCommandRepository');
+            }
+        }
     },
 
 

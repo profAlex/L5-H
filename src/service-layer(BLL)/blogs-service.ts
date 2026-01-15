@@ -24,9 +24,9 @@ export const blogsService = {
         return await dataCommandRepository.createNewBlog(newBlog);
     },
 
-    async createNewBlogPost(sentBlogId: string, newPost: PostInputModel): Promise<PostViewModel | undefined> {
+    async createNewBlogPost(sentBlogId: string, newPost: PostInputModel): Promise<string | undefined> {
 
-        return await dataCommandRepository.createNewBlogPost(sentBlogId, newPost);;
+        return await dataCommandRepository.createNewBlogPost(sentBlogId, newPost);
     },
 
     // async getSeveralPostsById(sentBlogId:string, sentSanitizedQuery: InputGetBlogPostsByIdQuery): Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {

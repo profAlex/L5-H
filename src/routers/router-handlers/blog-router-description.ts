@@ -23,6 +23,7 @@ export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuer
     const driversListOutput = await dataQueryRepository.getSeveralBlogs(sanitizedQuery);
 
     res.status(HttpStatus.Ok).send(driversListOutput);
+    return;
 };
 
 
@@ -31,14 +32,22 @@ export const createNewBlog = async (req: Request, res: Response) => {
     const insertedId = await blogsService.createNewBlog(req.body);
 
     if(insertedId){
-        // здесь идем в query repo с айдишником который нам вернул command repo
+        // а вот здесь уже идем в query repo с айдишником который нам вернул command repo
+        const result = await dataQueryRepository.findSingleBlog(insertedId);
 
+        if(result){
+            res.status(HttpStatus.Ok).json(result);
+            return;
+        }
     }
 
-    res.status(HttpStatus.Created).json(await blogsService.createNewBlog(req.body));
+    res.status(HttpStatus.InternalServerError).send('Unknown error while attempting to create new blog or couldn\'t return created blog from Query Database.');
+    return;
 };
 
+
 export const getSeveralPostsFromBlog = async (req: Request<{blogId: string}, {}, {}, InputGetBlogPostsByIdQuery>, res: Response) => {
+
     const sanitizedQuery = matchedData<InputGetBlogPostsByIdQuery>(req, {
         locations: ['query'],
         includeOptionals: true,
@@ -53,26 +62,35 @@ export const getSeveralPostsFromBlog = async (req: Request<{blogId: string}, {},
     const postListOutput = await dataQueryRepository.getSeveralPostsById(blogId, sanitizedQuery);
 
     res.status(HttpStatus.Ok).send(postListOutput);
+    return;
 };
 
 
 export const createNewBlogPost= async (req:Request, res:Response) => {
-    const result = await blogsService.createNewBlogPost(req.params.blogId, req.body)
+
+    // const insertedId = await blogsService.createNewBlog(req.body);
+
+    const insertedId = await blogsService.createNewBlogPost(req.params.blogId, req.body)
 
     res.status(HttpStatus.Created).json(result);
+    return;
 };
 
 
 export const findSingleBlog = async (req: Request, res: Response) => {
+
     const result = await dataQueryRepository.findSingleBlog(req.params.id);
 
     if(result === undefined)
     {
         res.sendStatus(HttpStatus.NotFound);
+        return;
     }
 
     res.status(HttpStatus.Ok).json(result);
+    return;
 };
+
 
 export const updateBlog = async (req: Request, res: Response) => {
     const result = await blogsService.updateBlog(req.params.id, req.body);
@@ -80,10 +98,13 @@ export const updateBlog = async (req: Request, res: Response) => {
     if(result === undefined)
     {
         res.sendStatus(HttpStatus.NotFound);
+        return;
     }
 
     res.sendStatus(HttpStatus.NoContent);
+    return;
 };
+
 
 export const deleteBlog = async (req: Request, res: Response) => {
     const result = await blogsService.deleteBlog(req.params.id);
@@ -91,7 +112,9 @@ export const deleteBlog = async (req: Request, res: Response) => {
     if(result === undefined)
     {
         res.sendStatus(HttpStatus.NotFound);
+        return;
     }
 
     res.sendStatus(HttpStatus.NoContent);
+    return;
 };
