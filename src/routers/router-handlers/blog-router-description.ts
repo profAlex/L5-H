@@ -36,7 +36,7 @@ export const createNewBlog = async (req: Request, res: Response) => {
         const result = await dataQueryRepository.findSingleBlog(insertedId);
 
         if(result){
-            res.status(HttpStatus.Ok).json(result);
+            res.status(HttpStatus.Created).json(result);
             return;
         }
     }
@@ -72,7 +72,17 @@ export const createNewBlogPost= async (req:Request, res:Response) => {
 
     const insertedId = await blogsService.createNewBlogPost(req.params.blogId, req.body)
 
-    res.status(HttpStatus.Created).json(result);
+    if(insertedId){
+        // а вот здесь уже идем в query repo с айдишником который нам вернул command repo
+        const result = await dataQueryRepository.findSinglePost(insertedId);
+
+        if(result){
+            res.status(HttpStatus.Created).json(result);
+            return;
+        }
+    }
+
+    res.status(HttpStatus.InternalServerError).send('Unknown error while attempting to create new blog-post or couldn\'t return created blog-post from Query Database.');
     return;
 };
 
