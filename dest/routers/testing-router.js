@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testingRouter = void 0;
 const express_1 = require("express");
-const blogger_mongodb_repository_1 = require("../repository/blogger-mongodb-repository");
-const http_statuses_1 = require("../core/http-statuses");
+const command_repository_1 = require("../repository-layers/command-repository-layer/command-repository");
+const http_statuses_1 = require("./util-enums/http-statuses");
 exports.testingRouter = (0, express_1.Router)();
 exports.testingRouter.delete('/all-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield blogger_mongodb_repository_1.dataRepository.deleteAllBloggers();
+    yield command_repository_1.dataCommandRepository.deleteAllBloggers();
     res.sendStatus(http_statuses_1.HttpStatus.NoContent);
 }));

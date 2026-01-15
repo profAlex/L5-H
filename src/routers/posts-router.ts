@@ -23,8 +23,8 @@ const validatePostId = createIdValidator({
     collectionName: CollectionNames.Posts,
 });
 
-postsRouter.get('/', inputPaginationValidatorForPosts(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPosts);
-postsRouter.post('/', superAdminGuardMiddleware, postInputModelValidation, inputErrorManagementMiddleware, createNewPost); //auth guarded
-postsRouter.get('/:id', validatePostId, inputErrorManagementMiddleware, findSinglePost);
-postsRouter.put('/:id', superAdminGuardMiddleware, validatePostId, /*inputErrorManagementMiddleware,*/ postInputModelValidation, inputErrorManagementMiddleware, updatePost); //auth guarded
-postsRouter.delete('/:id', superAdminGuardMiddleware, validatePostId, inputErrorManagementMiddleware, deletePost) //auth guarded
+postsRouter.get('/', inputPaginationValidatorForPosts(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPosts); // Returns all posts
+postsRouter.post('/', superAdminGuardMiddleware, postInputModelValidation, inputErrorManagementMiddleware, createNewPost); // auth guarded, Creates new post
+postsRouter.get('/:id', validatePostId, inputErrorManagementMiddleware, findSinglePost); // Return post by id
+postsRouter.put('/:id', superAdminGuardMiddleware, validatePostId, /*inputErrorManagementMiddleware,*/ postInputModelValidation, inputErrorManagementMiddleware, updatePost); // auth guarded, Update existing post by id with InputModel
+postsRouter.delete('/:id', superAdminGuardMiddleware, validatePostId, inputErrorManagementMiddleware, deletePost) // auth guarded, Delete post specified by id

@@ -43,15 +43,15 @@ const validateBlogIdForGeneralCRUDEndpoints = createIdValidator({
 });
 
 
-blogsRouter.get('/', inputPaginationValidatorForBlogs(BlogsSortListEnum), inputErrorManagementMiddleware, getSeveralBlogs);
-blogsRouter.post('/', superAdminGuardMiddleware, blogInputModelValidation, inputErrorManagementMiddleware, createNewBlog); //auth guarded
+blogsRouter.get('/', inputPaginationValidatorForBlogs(BlogsSortListEnum), inputErrorManagementMiddleware, getSeveralBlogs); // Returns blogs with paging
+blogsRouter.post('/', superAdminGuardMiddleware, blogInputModelValidation, inputErrorManagementMiddleware, createNewBlog); // auth guarded, Creates new blog
 
-blogsRouter.get('/:blogId/posts', validateBlogIdForSeveralPostsGetterEndpoint, inputPaginationValidatorForPosts(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPostsFromBlog);
-blogsRouter.post('/:blogId/posts', superAdminGuardMiddleware, validateBlogIdForBlogPostCreationEndpoint, blogRoutesPostInputModelValidation, inputErrorManagementMiddleware, createNewBlogPost);
+blogsRouter.get('/:blogId/posts', validateBlogIdForSeveralPostsGetterEndpoint, inputPaginationValidatorForPosts(PostsSortListEnum), inputErrorManagementMiddleware, getSeveralPostsFromBlog); // Returns all posts for specified blog
+blogsRouter.post('/:blogId/posts', superAdminGuardMiddleware, validateBlogIdForBlogPostCreationEndpoint, blogRoutesPostInputModelValidation, inputErrorManagementMiddleware, createNewBlogPost); // auth guarded, Creates new post for specific blog
 
-blogsRouter.get('/:id', validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, findSingleBlog);
-blogsRouter.put('/:id', superAdminGuardMiddleware, validateBlogIdForGeneralCRUDEndpoints, blogInputModelValidation, inputErrorManagementMiddleware, updateBlog); //auth guarded
-blogsRouter.delete('/:id', superAdminGuardMiddleware, validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, deleteBlog); //auth guarded
+blogsRouter.get('/:id', validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, findSingleBlog); // Returns blog by id
+blogsRouter.put('/:id', superAdminGuardMiddleware, validateBlogIdForGeneralCRUDEndpoints, blogInputModelValidation, inputErrorManagementMiddleware, updateBlog); // auth guarded, Update existing Blog by id with InputModel
+blogsRouter.delete('/:id', superAdminGuardMiddleware, validateBlogIdForGeneralCRUDEndpoints, inputErrorManagementMiddleware, deleteBlog); // auth guarded, Deletes blog specified by id
 
 
 

@@ -1,19 +1,14 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../util-enums/http-statuses";
-import {dataCommandRepository} from "../../repository-layers/command-repository-layer/command-repository";
 import {blogsService} from "../../service-layer(BLL)/blogs-service";
 import {InputGetBlogsQuery} from "../router-types/blog-search-input-model";
 import {matchedData} from "express-validator";
-import {PaginatedBlogViewModel} from "../router-types/blog-paginated-view-model";
-import {BlogViewModel} from "../router-types/blog-view-model";
-import {WithId} from "mongodb";
-import {mapToBlogListPaginatedOutput, mapToPostListPaginatedOutput} from "../../repository-layers/mappers/map-blog-search-to-view-model";
 import {InputGetBlogPostsByIdQuery} from "../router-types/blog-search-by-id-input-model";
-import {postsService} from "../../service-layer(BLL)/posts-service";
 import {dataQueryRepository} from "../../repository-layers/query-repository-layer/query-repository";
 
 
 export const getSeveralBlogs = async (req: Request<{}, {}, {}, InputGetBlogsQuery>, res: Response) => {
+
     const sanitizedQuery = matchedData<InputGetBlogsQuery>(req, {
         locations: ['query'],
         includeOptionals: true,

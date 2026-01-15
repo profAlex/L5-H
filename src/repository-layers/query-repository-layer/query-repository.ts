@@ -192,6 +192,7 @@ export const dataQueryRepository = {
 
 
     async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
+
         if (ObjectId.isValid(postId)) {
 
             const post: postCollectionStorageModel | null = await findPostByPrimaryKey(new ObjectId(postId));
@@ -204,5 +205,4 @@ export const dataQueryRepository = {
 
         return undefined;
     },
-
 }

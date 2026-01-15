@@ -3,12 +3,8 @@ import {BlogInputModel} from "../../routers/router-types/blog-input-model";
 import {PostViewModel} from "../../routers/router-types/post-view-model";
 import {PostInputModel} from "../../routers/router-types/post-input-model";
 import {bloggersCollection, postsCollection} from "../../db/mongo.db";
-import {ObjectId, WithId} from "mongodb";
-import {InputGetBlogsQuery} from "../../routers/router-types/blog-search-input-model";
-import {InputGetBlogPostsByIdQuery} from "../../routers/router-types/blog-search-by-id-input-model";
+import {ObjectId} from "mongodb";
 import {BlogPostInputModel} from "../../routers/router-types/blog-post-input-model";
-import {mapSingleBloggerCollectionToViewModel} from "../mappers/map-to-BlogViewModel";
-import {mapSinglePostCollectionToViewModel} from "../mappers/map-to-PostViewModel";
 import {CustomError} from "../utility/custom-error-class";
 
 
@@ -262,7 +258,7 @@ export const dataCommandRepository = {
             else
             {
                 console.error(`Unknown error: ${JSON.stringify(error)}`);
-                throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
             }
         }
 
@@ -332,61 +328,131 @@ export const dataCommandRepository = {
 
     async updateBlog(blogId: string, newData: BlogInputModel): Promise<null | undefined> {
 
-        if (ObjectId.isValid(blogId)) {
-
-            const idToCheck = new ObjectId(blogId);
-            const res = await bloggersCollection.updateOne(
-                {_id: idToCheck},
-                {$set: {...newData}}
-            );
-
-            if(res.matchedCount === 1)
-            {
-                return null;
-            }
-        }
+        // if (ObjectId.isValid(blogId)) {
         //
-        // const blogger = __nonDisclosableDatabase.bloggerRepository.find((blogger) => blogger.bloggerInfo.id === blogId);
+        //     const idToCheck = new ObjectId(blogId);
+        //     const res = await bloggersCollection.updateOne(
+        //         {_id: idToCheck},
+        //         {$set: {...newData}}
+        //     );
         //
-        // if(blogger)
-        // {
-        //     let blogIndex = __nonDisclosableDatabase.bloggerRepository.indexOf(blogger);
-        //
-        //     const updatedBlogger = {
-        //         ...blogger,
-        //         bloggerInfo: {
-        //             id: blogger.bloggerInfo.id,
-        //             name: newData.name,
-        //             description: newData.description,
-        //             websiteUrl: newData.websiteUrl
-        //         }
+        //     if(res.matchedCount === 1)
+        //     {
+        //         return null;
         //     }
-        //
-        //     __nonDisclosableDatabase.bloggerRepository[blogIndex] = updatedBlogger;
-        //
-        //     return null;
         // }
 
-        return undefined;
+
+        try{
+            if (ObjectId.isValid(blogId)) {
+
+                const idToCheck = new ObjectId(blogId);
+                const res = await bloggersCollection.updateOne(
+                    {_id: idToCheck},
+                    {$set: {...newData}}
+                );
+
+                if(!res.acknowledged)
+                {
+                    throw new CustomError({
+                        errorMessage: { field: 'bloggersCollection.updateOne', message: 'attempt to update blog entry failed' }
+                    });
+                }
+
+                if(res.matchedCount === 1)
+                {
+                    // успешное выполнение
+                    return null;
+                }
+            }
+            else {
+                throw new CustomError({
+                    errorMessage: { field: 'ObjectId.isValid(blogId)', message: 'invalid blog ID' }
+                });
+            }
+        }
+        catch (error) {
+            if(error instanceof CustomError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                }
+
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error inside dataCommandRepository.updateBlog: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in updateBlog method of dataCommandRepository');
+            }
+        }
     },
 
 
     async deleteBlog(blogId: string): Promise<null | undefined> {
 
-        if (ObjectId.isValid(blogId)) {
-            const idToCheck = new ObjectId(blogId);
-            const res = await bloggersCollection.deleteOne({_id: idToCheck});
+        // if (ObjectId.isValid(blogId)) {
+        //     const idToCheck = new ObjectId(blogId);
+        //     const res = await bloggersCollection.deleteOne({_id: idToCheck});
+        //
+        //
+        //
+        //     if(res.deletedCount === 1)
+        //     {
+        //         await postsCollection.deleteMany({ blogId: blogId }); // Надо связанные посты удалять?????????????????
+        //         return null;
+        //     }
+        // }
 
+        try{
+            if (ObjectId.isValid(blogId)) {
+                const idToCheck = new ObjectId(blogId);
+                const res = await bloggersCollection.deleteOne({_id: idToCheck});
 
+                if(!res.acknowledged)
+                {
+                    throw new CustomError({
+                        errorMessage: { field: 'bloggersCollection.deleteOne', message: 'attempt to delete blog entry failed' }
+                    });
+                }
 
-            if(res.deletedCount === 1)
-            {
-                await postsCollection.deleteMany({ blogId: blogId }); // Надо связанные посты удалять?????????????????
-                return null;
+                if(res.deletedCount === 1)
+                {
+                    return null;
+                }
+            }
+            else {
+                throw new CustomError({
+                    errorMessage: { field: 'ObjectId.isValid(blogId)', message: 'invalid blog ID' }
+                });
             }
         }
+        catch (error) {
+            if(error instanceof CustomError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                }
 
-        return undefined;
+                // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error inside dataCommandRepository.deleteBlog: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in deleteBlog method of dataCommandRepository');
+            }
+        }
     },
 
     // *****************************
@@ -420,45 +486,8 @@ export const dataCommandRepository = {
     },
 
 
-    // async getSeveralPosts(sentSanitizedQuery: InputGetBlogPostsByIdQuery) : Promise<{items: WithId<PostViewModel>[]; totalCount: number}> {
-    //     const {
-    //         sortBy,
-    //         sortDirection,
-    //         pageNumber,
-    //         pageSize,
-    //     } = sentSanitizedQuery;
-    //
-    //     const skip = (pageNumber - 1) * pageSize;
-    //
-    //     if(!sortBy) {
-    //         console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPosts");
-    //         throw new Error();
-    //     }
-    //
-    //     const items = await postsCollection
-    //         .find({})
-    //
-    //         // "asc" (по возрастанию), то используется 1
-    //         // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
-    //         .sort({[sortBy]: sortDirection})
-    //
-    //         // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
-    //         .skip(skip)
-    //
-    //         // ограничивает количество возвращаемых документов до значения pageSize
-    //         .limit(pageSize)
-    //         .toArray();
-    //
-    //     const totalCount = await postsCollection.countDocuments({});
-    //
-    //     return {items, totalCount};
-    // },
-
-
-    // ПРИВЕСТИ К ВИДУ КАК В ЗДЕСЬ ЖЕ ВЫШЕ, С ОБРАБОТКОЙ ОШИБОК!!!
-    async createNewPost(newPost: PostInputModel): Promise<PostViewModel | undefined> {
+    async createNewPost(newPost: PostInputModel): Promise<string | undefined> {
         try {
-
             if (ObjectId.isValid(newPost.blogId))
             {
                 const relatedBlogger = await findBlogByPrimaryKey(new ObjectId(newPost.blogId));
@@ -473,19 +502,51 @@ export const dataCommandRepository = {
                         createdAt: new Date()
                     } as postCollectionStorageModel;
 
-                    await postsCollection.insertOne(newPostEntry);
+                    const result = await postsCollection.insertOne(newPostEntry);
+                    if (!result.acknowledged)
+                    {
+                        throw new CustomError({
+                            errorMessage: { field: 'postsCollection.insertOne(newPostEntry)', message: 'attempt to insert new post entry failed' }
+                        });
+                    }
 
-                    return mapSinglePostCollectionToViewModel(newPostEntry);
+                    return result.insertedId.toString();
+                    // return mapSinglePostCollectionToViewModel(newPostEntry);
+                }
+                else
+                {
+                    throw new CustomError({
+                        errorMessage: { field: 'findBlogByPrimaryKey(new ObjectId(newPost.blogId))', message: 'attempt to find blogger failed' }
+                    });
                 }
             }
+            else{
+                throw new CustomError({
+                    errorMessage: { field: 'ObjectId.isValid(newPost.blogId)', message: 'invalid blogId' }
+                });
+            }
         }
-        catch(error) {
-            console.error("Unknown error inside dataRepository.createNewPost: ", error);
-            throw new Error("Unknown error inside dataRepository.createNewPost");
+        catch (error) {
+            if(error instanceof CustomError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                }
+
+                // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error inside dataCommandRepository.createNewPost: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in createNewPost method of dataCommandRepository');
+            }
         }
-
-        return undefined;
-
     },
 
 
@@ -543,53 +604,115 @@ export const dataCommandRepository = {
     },
 
 
-    // async findSinglePost(postId: string): Promise<PostViewModel | undefined> {
-    //     if (ObjectId.isValid(postId)) {
-    //
-    //         const post: postCollectionStorageModel | null = await findPostByPrimaryKey(new ObjectId(postId));
-    //
-    //         if(post)
-    //         {
-    //             return mapSinglePostCollectionToViewModel(post);
-    //         }
-    //     }
-    //
-    //     return undefined;
-    // },
-
-
     async updatePost(postId: string, newData: PostInputModel): Promise<null | undefined> {
+        try{
+            if (ObjectId.isValid(postId)) {
 
-        if (ObjectId.isValid(postId)) {
+                const idToCheck = new ObjectId(postId);
+                const res = await postsCollection.updateOne(
+                    {_id: idToCheck},
+                    {$set: {...newData}}
+                );
 
-            const idToCheck = new ObjectId(postId);
-            const res = await postsCollection.updateOne(
-                {_id: idToCheck},
-                {$set: {...newData}}
-            );
+                if(!res.acknowledged)
+                {
+                    throw new CustomError({
+                        errorMessage: { field: 'postsCollection.updateOne', message: 'attempt to update post entry failed' }
+                    });
+                }
 
-            if(res.matchedCount === 1)
-            {
-                return null;
+                if(res.matchedCount === 1)
+                {
+                    // успешное выполнение
+                    return null;
+                }
+            }
+            else {
+                throw new CustomError({
+                    errorMessage: { field: 'ObjectId.isValid(postId)', message: 'invalid post ID' }
+                });
             }
         }
-        return undefined;
+        catch (error) {
+            if(error instanceof CustomError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                }
+
+                // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error inside dataCommandRepository.updatePost: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in updatePost method of dataCommandRepository');
+            }
+        }
     },
 
 
     async deletePost(postId: string): Promise<null | undefined> {
 
-        if (ObjectId.isValid(postId)) {
-            const idToCheck = new ObjectId(postId);
-            const res = await postsCollection.deleteOne({_id: idToCheck});
+        // if (ObjectId.isValid(postId)) {
+        //     const idToCheck = new ObjectId(postId);
+        //     const res = await postsCollection.deleteOne({_id: idToCheck});
+        //
+        //     if(res.deletedCount === 1)
+        //     {
+        //         return null;
+        //     }
+        // }
 
-            if(res.deletedCount === 1)
-            {
-                return null;
+        try{
+            if (ObjectId.isValid(postId)) {
+                const idToCheck = new ObjectId(postId);
+                const res = await postsCollection.deleteOne({_id: idToCheck});
+
+                if(!res.acknowledged)
+                {
+                    throw new CustomError({
+                        errorMessage: { field: 'postsCollection.deleteOne', message: 'attempt to delete post entry failed' }
+                    });
+                }
+
+                if(res.deletedCount === 1)
+                {
+                    return null;
+                }
+            }
+            else {
+                throw new CustomError({
+                    errorMessage: { field: 'ObjectId.isValid(postId)', message: 'invalid post ID' }
+                });
             }
         }
+        catch (error) {
+            if(error instanceof CustomError) {
+                if(error.metaData)
+                {
+                    const errorData = error.metaData.errorMessage;
+                    console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                }
+                else
+                {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                }
 
-        return undefined;
+                // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                return undefined;
+            }
+            else
+            {
+                console.error(`Unknown error inside dataCommandRepository.deletePost: ${JSON.stringify(error)}`);
+                throw new Error('Placeholder for an error to be rethrown and dealt with in the future in deletePost method of dataCommandRepository');
+            }
+        }
     },
 
 
