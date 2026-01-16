@@ -17,3 +17,11 @@ export enum PostsSortListEnum {
     CreatedAt = 'createdAt',
     BlogName = 'blogName',
 };
+
+
+export enum UsersSortListEnum {
+    Id = 'id',
+    Login = 'login',
+    Email = 'email',
+    CreatedAt = 'createdAt',
+};

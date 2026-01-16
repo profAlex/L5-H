@@ -1,10 +1,12 @@
 import {Collection, Db, MongoClient} from "mongodb";
 import { BlogViewModel } from "../routers/router-types/blog-view-model";
 import {PostViewModel} from "../routers/router-types/post-view-model";
+import {UserViewModel} from "../routers/router-types/user-view-model";
 
 const DB_NAME = 'bloggers_db';
 const BLOGGERS_COLLECTION_NAME = 'bloggers_collection';
 const POSTS_COLLECTION_NAME = 'posts_collection';
+const USERS_COLLECTION_NAME = 'users_collection';
 
 const URI = "mongodb+srv://admin:admin@learningcluster.f1zm90x.mongodb.net/?retryWrites=true&w=majority&appName=LearningCluster";
 
@@ -14,19 +16,21 @@ let db: Db | null = null;
 export let client: MongoClient | null = null;
 export let bloggersCollection: Collection<BlogViewModel>;
 export let postsCollection: Collection<PostViewModel>;
+export let usersCollection: Collection<UserViewModel>;
 
 
 export async function runDB() {
     client = new MongoClient(URI);
     db = client.db(DB_NAME);
+
     bloggersCollection = db.collection<BlogViewModel>(BLOGGERS_COLLECTION_NAME);
     postsCollection = db.collection<PostViewModel>(POSTS_COLLECTION_NAME);
-
+    usersCollection = db.collection<UserViewModel>(USERS_COLLECTION_NAME);
 
     try {
         await client.connect();
         await db.command({ping: 1});
-        console.log(`Connected to DB ${DB_NAME}`);
+        console.log(`🟢 Connected to DB ${DB_NAME}`);
     }
     catch (error) {
         await client.close();
@@ -38,6 +42,7 @@ export async function closeDB(){
     try {
         if (client) {
             await client.close();
+
             console.log('🛑 MongoDB connection closed');
             client = null;
             db = null;
