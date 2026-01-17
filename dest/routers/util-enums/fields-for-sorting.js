@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostsSortListEnum = exports.BlogsSortListEnum = void 0;
+exports.UsersSortListEnum = exports.PostsSortListEnum = exports.BlogsSortListEnum = void 0;
 var BlogsSortListEnum;
 (function (BlogsSortListEnum) {
     BlogsSortListEnum["Id"] = "id";
@@ -21,4 +21,12 @@ var PostsSortListEnum;
     PostsSortListEnum["CreatedAt"] = "createdAt";
     PostsSortListEnum["BlogName"] = "blogName";
 })(PostsSortListEnum || (exports.PostsSortListEnum = PostsSortListEnum = {}));
+;
+var UsersSortListEnum;
+(function (UsersSortListEnum) {
+    UsersSortListEnum["Id"] = "id";
+    UsersSortListEnum["Login"] = "login";
+    UsersSortListEnum["Email"] = "email";
+    UsersSortListEnum["CreatedAt"] = "createdAt";
+})(UsersSortListEnum || (exports.UsersSortListEnum = UsersSortListEnum = {}));
 ;

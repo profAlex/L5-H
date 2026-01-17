@@ -11,10 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dataQueryRepository = void 0;
 const mongo_db_1 = require("../../db/mongo.db");
-const map_blog_search_to_view_model_1 = require("../mappers/map-blog-search-to-view-model");
 const mongodb_1 = require("mongodb");
 const map_to_BlogViewModel_1 = require("../mappers/map-to-BlogViewModel");
 const map_to_PostViewModel_1 = require("../mappers/map-to-PostViewModel");
+const map_paginated_blog_search_1 = require("../mappers/map-paginated-blog-search");
+const map_paginated_post_search_1 = require("../mappers/map-paginated-post-search");
+const map_paginated_user_search_1 = require("../mappers/map-paginated-user-search");
 function findBlogByPrimaryKey(id) {
     return __awaiter(this, void 0, void 0, function* () {
         return mongo_db_1.bloggersCollection.findOne({ _id: id });
@@ -37,24 +39,25 @@ exports.dataQueryRepository = {
             try {
                 if (searchNameTerm && searchNameTerm.trim() !== '') {
                     // Экранируем спецсимволы для безопасного $regex
-                    const escapedTerm = searchNameTerm
+                    const escapedSearchTerm = searchNameTerm
                         .trim()
                         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     filter = {
                         $or: [
-                            { name: { $regex: escapedTerm, $options: 'i' } },
-                            { description: { $regex: escapedTerm, $options: 'i' } },
-                            { websiteUrl: { $regex: escapedTerm, $options: 'i' } },
+                            { name: { $regex: escapedSearchTerm, $options: 'i' } },
+                            { description: { $regex: escapedSearchTerm, $options: 'i' } },
+                            { websiteUrl: { $regex: escapedSearchTerm, $options: 'i' } },
                         ],
                     };
                 }
             }
             catch (err) {
-                console.error("ERROR: ", err);
+                console.error("Error while processing and adding filtering conditions inside dataQueryRepository.getSeveralBlogs: ", err);
+                throw new Error("Error while processing and adding filtering conditions inside dataQueryRepository.getSeveralBlogs");
             }
             if (!sortBy) {
-                console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralBlogs");
-                throw new Error();
+                console.error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralBlogs");
+                throw new Error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralBlogs");
             }
             const items = yield mongo_db_1.bloggersCollection
                 .find(filter)
@@ -67,7 +70,7 @@ exports.dataQueryRepository = {
                 .limit(pageSize)
                 .toArray();
             const totalCount = yield mongo_db_1.bloggersCollection.countDocuments(filter);
-            return (0, map_blog_search_to_view_model_1.mapToBlogListPaginatedOutput)(items, {
+            return (0, map_paginated_blog_search_1.mapToBlogListPaginatedOutput)(items, {
                 pageNumber: pageNumber,
                 pageSize: pageSize,
                 totalCount,
@@ -79,8 +82,8 @@ exports.dataQueryRepository = {
             const { sortBy, sortDirection, pageNumber, pageSize, } = sentSanitizedQuery;
             const skip = (pageNumber - 1) * pageSize;
             if (!sortBy) {
-                console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPostsById");
-                throw new Error();
+                console.error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralPostsById");
+                throw new Error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralPostsById");
             }
             const items = yield mongo_db_1.postsCollection
                 .find({ blogId: sentBlogId })
@@ -93,7 +96,7 @@ exports.dataQueryRepository = {
                 .limit(pageSize)
                 .toArray();
             const totalCount = yield mongo_db_1.postsCollection.countDocuments({ blogId: sentBlogId });
-            return (0, map_blog_search_to_view_model_1.mapToPostListPaginatedOutput)(items, {
+            return (0, map_paginated_post_search_1.mapToPostListPaginatedOutput)(items, {
                 pageNumber: pageNumber,
                 pageSize: pageSize,
                 totalCount,
@@ -119,8 +122,8 @@ exports.dataQueryRepository = {
             const { sortBy, sortDirection, pageNumber, pageSize, } = sentSanitizedQuery;
             const skip = (pageNumber - 1) * pageSize;
             if (!sortBy) {
-                console.error("ERROR: sortBy is null or undefined inside dataRepository.getSeveralPosts");
-                throw new Error();
+                console.error("ERROR: sortBy is null or undefined inside dataQueryRepository.getSeveralPosts");
+                throw new Error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralPosts");
             }
             const items = yield mongo_db_1.postsCollection
                 .find({})
@@ -133,7 +136,7 @@ exports.dataQueryRepository = {
                 .limit(pageSize)
                 .toArray();
             const totalCount = yield mongo_db_1.postsCollection.countDocuments({});
-            return (0, map_blog_search_to_view_model_1.mapToPostListPaginatedOutput)(items, {
+            return (0, map_paginated_post_search_1.mapToPostListPaginatedOutput)(items, {
                 pageNumber: pageNumber,
                 pageSize: pageSize,
                 totalCount,
@@ -149,6 +152,81 @@ exports.dataQueryRepository = {
                 }
             }
             return undefined;
+        });
+    },
+    // *****************************
+    // методы для управления юзерами
+    // *****************************
+    getSeveralUsers(sentInputGetUsersQuery) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { searchLoginTerm, searchEmailTerm, sortBy, sortDirection, pageNumber, pageSize, } = sentInputGetUsersQuery;
+            let filter = {};
+            const skip = (pageNumber - 1) * pageSize;
+            try {
+                // добавление первого условия (если было передано)
+                if (searchEmailTerm && searchEmailTerm.trim() !== '') {
+                    // экранируем спецсимволы для безопасного $regex
+                    const escapedSearchTerm = searchEmailTerm
+                        .trim()
+                        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const additionalFilterCondition = {
+                        email: { $regex: escapedSearchTerm, $options: 'i' }
+                    };
+                    if (filter.$or) {
+                        filter.$or.push(additionalFilterCondition);
+                    }
+                    else {
+                        filter = {
+                            $or: [
+                                additionalFilterCondition,
+                            ]
+                        };
+                    }
+                }
+                // добавление второго условия (если было передано)
+                if (searchLoginTerm && searchLoginTerm.trim() !== '') {
+                    const escapedSearchTerm = searchLoginTerm
+                        .trim()
+                        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const additionalFilterCondition = {
+                        login: { $regex: escapedSearchTerm, $options: 'i' }
+                    };
+                    if (filter.$or) {
+                        filter.$or.push(additionalFilterCondition);
+                    }
+                    else {
+                        filter = {
+                            $or: [
+                                additionalFilterCondition,
+                            ]
+                        };
+                    }
+                }
+            }
+            catch (err) {
+                console.error("Error while processing and adding filtering conditions inside dataQueryRepository.getSeveralUsers: ", err);
+                throw new Error("Error while processing and adding filtering conditions inside dataQueryRepository.getSeveralUsers");
+            }
+            if (!sortBy) {
+                console.error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralUsers");
+                throw new Error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralUsers");
+            }
+            const items = yield mongo_db_1.usersCollection
+                .find(filter)
+                // "asc" (по возрастанию), то используется 1
+                // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
+                .sort({ [sortBy]: sortDirection })
+                // пропускаем определённое количество документов перед тем, как вернуть нужный набор данных.
+                .skip(skip)
+                // ограничивает количество возвращаемых документов до значения pageSize
+                .limit(pageSize)
+                .toArray();
+            const totalCount = yield mongo_db_1.usersCollection.countDocuments(filter);
+            return (0, map_paginated_user_search_1.mapToUsersListPaginatedOutput)(items, {
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                totalCount,
+            });
         });
     },
 };

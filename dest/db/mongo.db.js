@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = exports.postsCollection = exports.bloggersCollection = exports.client = void 0;
+exports.db = exports.usersCollection = exports.postsCollection = exports.bloggersCollection = exports.client = void 0;
 exports.runDB = runDB;
 exports.closeDB = closeDB;
 const mongodb_1 = require("mongodb");
 const DB_NAME = 'bloggers_db';
 const BLOGGERS_COLLECTION_NAME = 'bloggers_collection';
 const POSTS_COLLECTION_NAME = 'posts_collection';
+const USERS_COLLECTION_NAME = 'users_collection';
 const URI = "mongodb+srv://admin:admin@learningcluster.f1zm90x.mongodb.net/?retryWrites=true&w=majority&appName=LearningCluster";
 let db = null;
 exports.db = db;
@@ -26,10 +27,11 @@ function runDB() {
         exports.db = db = exports.client.db(DB_NAME);
         exports.bloggersCollection = db.collection(BLOGGERS_COLLECTION_NAME);
         exports.postsCollection = db.collection(POSTS_COLLECTION_NAME);
+        exports.usersCollection = db.collection(USERS_COLLECTION_NAME);
         try {
             yield exports.client.connect();
             yield db.command({ ping: 1 });
-            console.log(`Connected to DB ${DB_NAME}`);
+            console.log(`🟢 Connected to DB ${DB_NAME}`);
         }
         catch (error) {
             yield exports.client.close();

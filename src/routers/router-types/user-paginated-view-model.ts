@@ -1,6 +1,6 @@
 import {UserViewModel} from "./user-view-model";
 
-export type PaginatedBlogViewModel = {
+export type PaginatedUserViewModel = {
     pagesCount: number;
     page: number;
     pageSize: number;
