@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userInputModelValidation = void 0;
+exports.loginInputModelValidation = exports.userInputModelValidation = void 0;
 const express_validator_1 = require("express-validator");
 const loginValidation = (0, express_validator_1.body)('login')
     .exists().withMessage('Field \'login\' must be specified')
@@ -20,8 +20,18 @@ const emailValidation = (0, express_validator_1.body)('email')
     .trim()
     .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
     .withMessage('Field \'email\' contains inappropriate symbols');
+const loginAndEmailValidation = (0, express_validator_1.body)('loginOrEmail')
+    .exists().withMessage('Field \'loginOrEmail\' must be specified')
+    .isString().withMessage('Incorrect type of field \'loginOrEmail\' - must be string')
+    .trim()
+    .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+    .withMessage('Field \'loginOrEmail\' contains inappropriate symbols');
 exports.userInputModelValidation = [
     loginValidation,
     passwordValidation,
     emailValidation,
+];
+exports.loginInputModelValidation = [
+    loginAndEmailValidation,
+    passwordValidation,
 ];

@@ -8,6 +8,5 @@ export const mapSingleUserCollectionToViewModel = (userInContainer: WithId<UserC
         login: userInContainer.login,
         email: userInContainer.email,
         createdAt: userInContainer.createdAt,
-
     } as UserViewModel;
 };

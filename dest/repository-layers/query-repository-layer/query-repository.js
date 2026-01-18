@@ -246,4 +246,11 @@ exports.dataQueryRepository = {
             return undefined;
         });
     },
+    findByLoginOrEmail(loginOrEmail) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return mongo_db_1.usersCollection.findOne({
+                $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+            });
+        });
+    },
 };

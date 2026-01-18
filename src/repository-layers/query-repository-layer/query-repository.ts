@@ -334,4 +334,13 @@ export const dataQueryRepository = {
 
         return undefined;
     },
+
+
+
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<UserCollectionStorageModel> | null> {
+
+        return usersCollection.findOne({
+            $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+        });
+    },
 }
