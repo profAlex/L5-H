@@ -5,4 +5,5 @@ var CollectionNames;
 (function (CollectionNames) {
     CollectionNames["Posts"] = "postsCollection";
     CollectionNames["Blogs"] = "bloggersCollection";
+    CollectionNames["Users"] = "usersCollection";
 })(CollectionNames || (exports.CollectionNames = CollectionNames = {}));

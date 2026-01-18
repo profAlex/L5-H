@@ -43,7 +43,7 @@ export const blogsService = {
         return await dataCommandRepository.updateBlog(blogId, newData);
     },
 
-    async deleteBlog (blogId: string) {
+    async deleteBlog (blogId: string) : Promise<null | undefined> {
         return await dataCommandRepository.deleteBlog(blogId);
     },
 

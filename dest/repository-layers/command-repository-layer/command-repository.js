@@ -594,6 +594,86 @@ exports.dataCommandRepository = {
         });
     },
     // *****************************
+    // методы для управления юзерами
+    // *****************************
+    createNewUser(sentNewUser) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const tempId = new mongodb_1.ObjectId();
+                const newUserEntry = {
+                    id: tempId.toString(),
+                    login: sentNewUser.login,
+                    email: sentNewUser.email,
+                    createdAt: (new Date()).toString(),
+                };
+                const result = yield mongo_db_1.usersCollection.insertOne(newUserEntry);
+                if (!result.acknowledged) {
+                    throw new custom_error_class_1.CustomError({
+                        errorMessage: { field: 'usersCollection.insertOne(newUserEntry)', message: 'attempt to insert new user entry failed' }
+                    });
+                }
+                // return mapSingleBloggerCollectionToViewModel(newBlogEntry);
+                return result.insertedId.toString();
+            }
+            catch (error) {
+                if (error instanceof custom_error_class_1.CustomError) {
+                    if (error.metaData) {
+                        const errorData = error.metaData.errorMessage;
+                        console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                    }
+                    else {
+                        console.error(`Unknown error: ${JSON.stringify(error)}`);
+                    }
+                    return undefined;
+                }
+                else {
+                    console.error(`Unknown error: ${JSON.stringify(error)}`);
+                    throw new Error('Placeholder for an error to be rethrown and dealt with in the future in createNewUser method of dataCommandRepository');
+                }
+            }
+        });
+    },
+    deleteUser(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (mongodb_1.ObjectId.isValid(userId)) {
+                    const idToCheck = new mongodb_1.ObjectId(userId);
+                    const res = yield mongo_db_1.usersCollection.deleteOne({ _id: idToCheck });
+                    if (!res.acknowledged) {
+                        throw new custom_error_class_1.CustomError({
+                            errorMessage: { field: 'usersCollection.deleteOne', message: 'attempt to delete user entry failed' }
+                        });
+                    }
+                    if (res.deletedCount === 1) {
+                        return null;
+                    }
+                }
+                else {
+                    throw new custom_error_class_1.CustomError({
+                        errorMessage: { field: 'ObjectId.isValid(userId)', message: 'invalid user ID' }
+                    });
+                }
+            }
+            catch (error) {
+                if (error instanceof custom_error_class_1.CustomError) {
+                    if (error.metaData) {
+                        const errorData = error.metaData.errorMessage;
+                        console.error(`In field: ${errorData.field} - ${errorData.message}`);
+                    }
+                    else {
+                        console.error(`Unknown error: ${JSON.stringify(error)}`);
+                    }
+                    // throw new Error('Placeholder for an error in to be rethrown and dealt with in the future in createNewBlog method of dataCommandRepository');
+                    return undefined;
+                }
+                else {
+                    console.error(`Unknown error inside dataCommandRepository.deleteUser: ${JSON.stringify(error)}`);
+                    throw new Error('Placeholder for an error to be rethrown and dealt with in the future in deleteUser method of dataCommandRepository');
+                }
+            }
+        });
+    },
+    // *****************************
     // методы для тестов
     // *****************************
     deleteAllBloggers() {

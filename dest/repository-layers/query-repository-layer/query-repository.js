@@ -17,6 +17,7 @@ const map_to_PostViewModel_1 = require("../mappers/map-to-PostViewModel");
 const map_paginated_blog_search_1 = require("../mappers/map-paginated-blog-search");
 const map_paginated_post_search_1 = require("../mappers/map-paginated-post-search");
 const map_paginated_user_search_1 = require("../mappers/map-paginated-user-search");
+const map_to_UserViewModel_1 = require("../mappers/map-to-UserViewModel");
 function findBlogByPrimaryKey(id) {
     return __awaiter(this, void 0, void 0, function* () {
         return mongo_db_1.bloggersCollection.findOne({ _id: id });
@@ -25,6 +26,11 @@ function findBlogByPrimaryKey(id) {
 function findPostByPrimaryKey(id) {
     return __awaiter(this, void 0, void 0, function* () {
         return mongo_db_1.postsCollection.findOne({ _id: id });
+    });
+}
+function findUserByPrimaryKey(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return mongo_db_1.usersCollection.findOne({ _id: id });
     });
 }
 exports.dataQueryRepository = {
@@ -227,6 +233,17 @@ exports.dataQueryRepository = {
                 pageSize: pageSize,
                 totalCount,
             });
+        });
+    },
+    findSingleUser(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (mongodb_1.ObjectId.isValid(userId)) {
+                const user = yield findUserByPrimaryKey(new mongodb_1.ObjectId(userId));
+                if (user) {
+                    return (0, map_to_UserViewModel_1.mapSingleUserCollectionToViewModel)(user);
+                }
+            }
+            return undefined;
         });
     },
 };

@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction, json} from "express";
 import {ObjectId} from "mongodb";
 import {HttpStatus} from "../util-enums/http-statuses";
-import {postsCollection, bloggersCollection} from "../../db/mongo.db";
+import {postsCollection, bloggersCollection, usersCollection} from "../../db/mongo.db";
 
 
 
@@ -70,6 +70,12 @@ async function validateId(
         }
         else if (collectionName === 'postsCollection') {
             result = await postsCollection.findOne(
+                { _id: new ObjectId(sentId) },
+                { projection: { _id: 1 } }
+            );
+        }
+        else if (collectionName === 'usersCollection') {
+            result = await usersCollection.findOne(
                 { _id: new ObjectId(sentId) },
                 { projection: { _id: 1 } }
             );

@@ -18,6 +18,7 @@ import {mapToBlogListPaginatedOutput} from "../mappers/map-paginated-blog-search
 import {mapToPostListPaginatedOutput} from "../mappers/map-paginated-post-search";
 import {UserViewModel} from "../../routers/router-types/user-view-model";
 import {mapToUsersListPaginatedOutput} from "../mappers/map-paginated-user-search";
+import {mapSingleUserCollectionToViewModel} from "../mappers/map-to-UserViewModel";
 
 
 async function findBlogByPrimaryKey(id: ObjectId): Promise<bloggerCollectionStorageModel | null> {
@@ -27,6 +28,11 @@ async function findBlogByPrimaryKey(id: ObjectId): Promise<bloggerCollectionStor
 
 async function findPostByPrimaryKey(id: ObjectId): Promise<postCollectionStorageModel | null> {
     return postsCollection.findOne({ _id: id });
+}
+
+
+async function findUserByPrimaryKey(id: ObjectId): Promise<WithId<UserViewModel> | null> {
+    return usersCollection.findOne({ _id: id });
 }
 
 
@@ -310,5 +316,21 @@ export const dataQueryRepository = {
             pageSize: pageSize,
             totalCount,
         });
+    },
+
+
+    async findSingleUser(userId: string): Promise<UserViewModel | undefined> {
+
+        if (ObjectId.isValid(userId)) {
+
+            const user: WithId<UserViewModel> | null = await findUserByPrimaryKey(new ObjectId(userId));
+
+            if(user)
+            {
+                return mapSingleUserCollectionToViewModel(user);
+            }
+        }
+
+        return undefined;
     },
 }

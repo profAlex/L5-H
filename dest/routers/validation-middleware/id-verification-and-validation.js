@@ -47,6 +47,9 @@ function validateId(sentId, collectionName, res) {
             else if (collectionName === 'postsCollection') {
                 result = yield mongo_db_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(sentId) }, { projection: { _id: 1 } });
             }
+            else if (collectionName === 'usersCollection') {
+                result = yield mongo_db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(sentId) }, { projection: { _id: 1 } });
+            }
             else {
                 result = null;
             }
