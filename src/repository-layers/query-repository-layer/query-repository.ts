@@ -19,6 +19,7 @@ import {mapToPostListPaginatedOutput} from "../mappers/map-paginated-post-search
 import {UserViewModel} from "../../routers/router-types/user-view-model";
 import {mapToUsersListPaginatedOutput} from "../mappers/map-paginated-user-search";
 import {mapSingleUserCollectionToViewModel} from "../mappers/map-to-UserViewModel";
+import {UserCollectionStorageModel} from "../../routers/router-types/user-storage-model";
 
 
 async function findBlogByPrimaryKey(id: ObjectId): Promise<bloggerCollectionStorageModel | null> {
@@ -31,7 +32,7 @@ async function findPostByPrimaryKey(id: ObjectId): Promise<postCollectionStorage
 }
 
 
-async function findUserByPrimaryKey(id: ObjectId): Promise<WithId<UserViewModel> | null> {
+async function findUserByPrimaryKey(id: ObjectId): Promise<WithId<UserCollectionStorageModel> | null> {
     return usersCollection.findOne({ _id: id });
 }
 
@@ -295,7 +296,7 @@ export const dataQueryRepository = {
             throw new Error("Error: sortBy is null or undefined inside dataQueryRepository.getSeveralUsers");
         }
 
-        const items :WithId<UserViewModel>[] = await usersCollection
+        const items :WithId<UserCollectionStorageModel>[] = await usersCollection
             .find(filter)
 
             // "asc" (по возрастанию), то используется 1
@@ -323,7 +324,7 @@ export const dataQueryRepository = {
 
         if (ObjectId.isValid(userId)) {
 
-            const user: WithId<UserViewModel> | null = await findUserByPrimaryKey(new ObjectId(userId));
+            const user: WithId<UserCollectionStorageModel> | null = await findUserByPrimaryKey(new ObjectId(userId));
 
             if(user)
             {

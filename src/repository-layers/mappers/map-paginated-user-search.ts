@@ -1,9 +1,10 @@
 import {UserViewModel} from "../../routers/router-types/user-view-model";
 import {WithId} from "mongodb";
 import {PaginatedUserViewModel} from "../../routers/router-types/user-paginated-view-model";
+import {UserCollectionStorageModel} from "../../routers/router-types/user-storage-model";
 
 export function mapToUsersListPaginatedOutput(
-    users: WithId<UserViewModel>[],
+    users: WithId<UserCollectionStorageModel>[],
     metaData: { pageNumber: number; pageSize: number; totalCount: number },
 ): PaginatedUserViewModel {
     return {

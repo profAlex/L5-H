@@ -13,6 +13,7 @@ exports.dataCommandRepository = void 0;
 const mongo_db_1 = require("../../db/mongo.db");
 const mongodb_1 = require("mongodb");
 const custom_error_class_1 = require("../utility/custom-error-class");
+const bcypt_1 = require("../../authentication/bcypt");
 // const __nonDisclosableDatabase = {
 //     bloggerRepository: [{
 //         bloggerInfo:
@@ -599,11 +600,13 @@ exports.dataCommandRepository = {
     createNewUser(sentNewUser) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const passwordHash = yield bcypt_1.bcryptService.generateHash(sentNewUser.password);
                 const tempId = new mongodb_1.ObjectId();
                 const newUserEntry = {
                     id: tempId.toString(),
                     login: sentNewUser.login,
                     email: sentNewUser.email,
+                    passwordHash: passwordHash,
                     createdAt: (new Date()).toString(),
                 };
                 const result = yield mongo_db_1.usersCollection.insertOne(newUserEntry);

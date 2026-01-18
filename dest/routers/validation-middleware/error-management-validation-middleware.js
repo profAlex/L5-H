@@ -43,7 +43,7 @@ const inputErrorManagementMiddleware = (req, res, next) => {
         //     res.status(HttpStatus.BadRequest).json({ errorsMessages: errors });
         //     //return;
         // }
-        //console.error(`Error ${HttpStatus.BadRequest}: ${errors[0].message}`);
+        // console.error(`Error ${HttpStatus.BadRequest}: ${errors[0].message}`);
         res.status(http_statuses_1.HttpStatus.BadRequest).json({ errorsMessages: errors });
     }
     next();

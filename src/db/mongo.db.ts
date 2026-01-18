@@ -1,7 +1,7 @@
 import {Collection, Db, MongoClient} from "mongodb";
 import { BlogViewModel } from "../routers/router-types/blog-view-model";
 import {PostViewModel} from "../routers/router-types/post-view-model";
-import {UserViewModel} from "../routers/router-types/user-view-model";
+import {UserCollectionStorageModel} from "../routers/router-types/user-storage-model";
 
 const DB_NAME = 'bloggers_db';
 const BLOGGERS_COLLECTION_NAME = 'bloggers_collection';
@@ -16,7 +16,7 @@ let db: Db | null = null;
 export let client: MongoClient | null = null;
 export let bloggersCollection: Collection<BlogViewModel>;
 export let postsCollection: Collection<PostViewModel>;
-export let usersCollection: Collection<UserViewModel>;
+export let usersCollection: Collection<UserCollectionStorageModel>;
 
 
 export async function runDB() {
@@ -25,7 +25,7 @@ export async function runDB() {
 
     bloggersCollection = db.collection<BlogViewModel>(BLOGGERS_COLLECTION_NAME);
     postsCollection = db.collection<PostViewModel>(POSTS_COLLECTION_NAME);
-    usersCollection = db.collection<UserViewModel>(USERS_COLLECTION_NAME);
+    usersCollection = db.collection<UserCollectionStorageModel>(USERS_COLLECTION_NAME);
 
     try {
         await client.connect();

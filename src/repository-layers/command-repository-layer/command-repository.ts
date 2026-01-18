@@ -1,4 +1,3 @@
-import {BlogViewModel} from "../../routers/router-types/blog-view-model";
 import {BlogInputModel} from "../../routers/router-types/blog-input-model";
 import {PostViewModel} from "../../routers/router-types/post-view-model";
 import {PostInputModel} from "../../routers/router-types/post-input-model";
@@ -8,6 +7,8 @@ import {BlogPostInputModel} from "../../routers/router-types/blog-post-input-mod
 import {CustomError} from "../utility/custom-error-class";
 import {UserInputModel} from "../../routers/router-types/user-input-model";
 import {UserViewModel} from "../../routers/router-types/user-view-model";
+import {bcryptService} from "../../authentication/bcypt";
+import {UserCollectionStorageModel} from "../../routers/router-types/user-storage-model";
 
 
 export type bloggerCollectionStorageModel= {
@@ -722,13 +723,16 @@ export const dataCommandRepository = {
 
     async createNewUser(sentNewUser: UserInputModel): Promise<string | undefined> {
         try {
+            const passwordHash = await bcryptService.generateHash(sentNewUser.password);
+
             const tempId = new ObjectId();
             const newUserEntry = {
                 id: tempId.toString(),
                 login: sentNewUser.login,
                 email: sentNewUser.email,
+                passwordHash: passwordHash,
                 createdAt: (new Date()).toString(),
-            } as UserViewModel;
+            } as UserCollectionStorageModel;
 
 
             const result = await usersCollection.insertOne(newUserEntry);
