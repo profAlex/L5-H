@@ -48,22 +48,9 @@ export const inputErrorManagementMiddleware = (
     const errors = validationResult(req).formatWith(formatErrors).array({ onlyFirstError: true });
 
     if (errors.length > 0) {
-        // if(errors[0].message.toLowerCase().includes('not found')) {
-        //     // console.log(errors[0].message);
-        //
-        //     res.status(HttpStatus.NotFound).json({ errorsMessages: errors });
-        //     //return;
-        // }
-        // else if (errors[0].message.toLowerCase().includes('invalid')) {
-        //     // console.log(errors[0].message);
-        //
-        //     res.status(HttpStatus.BadRequest).json({ errorsMessages: errors });
-        //     //return;
-        // }
-
         console.log(`Error ${HttpStatus.BadRequest}: ${errors[0].message}`);
-        res.status(HttpStatus.BadRequest).json({ errorsMessages: errors });
+        return res.status(HttpStatus.BadRequest).json({ errorsMessages: errors });
     }
 
-    next();
+    return next();
 };
