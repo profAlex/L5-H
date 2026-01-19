@@ -30,6 +30,7 @@ function findPostByPrimaryKey(id) {
 }
 function findUserByPrimaryKey(id) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("REPEAT ID: ", id.toString());
         return mongo_db_1.usersCollection.findOne({ _id: id });
     });
 }
@@ -238,8 +239,11 @@ exports.dataQueryRepository = {
     findSingleUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (mongodb_1.ObjectId.isValid(userId)) {
+                console.log(userId);
                 const user = yield findUserByPrimaryKey(new mongodb_1.ObjectId(userId));
                 if (user) {
+                    console.log("here");
+                    console.log(JSON.stringify(user));
                     return (0, map_to_UserViewModel_1.mapSingleUserCollectionToViewModel)(user);
                 }
             }
@@ -253,4 +257,17 @@ exports.dataQueryRepository = {
             });
         });
     },
+    // *****************************
+    // методы для тестов
+    // *****************************
+    returnBloggersAmount() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield mongo_db_1.bloggersCollection.countDocuments();
+        });
+    },
+    returnUsersAmount() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield mongo_db_1.usersCollection.countDocuments();
+        });
+    }
 };

@@ -603,18 +603,21 @@ exports.dataCommandRepository = {
                 const passwordHash = yield bcypt_1.bcryptService.generateHash(sentNewUser.password);
                 const tempId = new mongodb_1.ObjectId();
                 const newUserEntry = {
+                    _id: tempId,
                     id: tempId.toString(),
                     login: sentNewUser.login,
                     email: sentNewUser.email,
                     passwordHash: passwordHash,
-                    createdAt: (new Date()).toString(),
+                    createdAt: new Date(),
                 };
+                console.log(JSON.stringify(newUserEntry));
                 const result = yield mongo_db_1.usersCollection.insertOne(newUserEntry);
                 if (!result.acknowledged) {
                     throw new custom_error_class_1.CustomError({
                         errorMessage: { field: 'usersCollection.insertOne(newUserEntry)', message: 'attempt to insert new user entry failed' }
                     });
                 }
+                // console.log(JSON.stringify(newUserEntry));
                 // return mapSingleBloggerCollectionToViewModel(newBlogEntry);
                 return result.insertedId.toString();
             }
@@ -683,11 +686,7 @@ exports.dataCommandRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             yield mongo_db_1.bloggersCollection.deleteMany({});
             yield mongo_db_1.postsCollection.deleteMany({});
+            yield mongo_db_1.usersCollection.deleteMany({});
         });
     },
-    returnBloggersAmount() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield mongo_db_1.bloggersCollection.countDocuments();
-        });
-    }
 };

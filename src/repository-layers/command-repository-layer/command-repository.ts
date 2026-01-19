@@ -727,13 +727,15 @@ export const dataCommandRepository = {
 
             const tempId = new ObjectId();
             const newUserEntry = {
+                _id: tempId,
                 id: tempId.toString(),
                 login: sentNewUser.login,
                 email: sentNewUser.email,
                 passwordHash: passwordHash,
-                createdAt: (new Date()).toString(),
+                createdAt: new Date(),
             } as UserCollectionStorageModel;
 
+            console.log(JSON.stringify(newUserEntry));
 
             const result = await usersCollection.insertOne(newUserEntry);
 
@@ -743,7 +745,7 @@ export const dataCommandRepository = {
                     errorMessage: { field: 'usersCollection.insertOne(newUserEntry)', message: 'attempt to insert new user entry failed' }
                 });
             }
-
+            // console.log(JSON.stringify(newUserEntry));
             // return mapSingleBloggerCollectionToViewModel(newBlogEntry);
             return result.insertedId.toString();
         }
@@ -825,9 +827,7 @@ export const dataCommandRepository = {
     async deleteAllBloggers() {
         await bloggersCollection.deleteMany({});
         await postsCollection.deleteMany({});
+        await usersCollection.deleteMany({});
     },
 
-    async returnBloggersAmount() {
-        return await bloggersCollection.countDocuments();
-    }
 }

@@ -32,7 +32,9 @@ async function findPostByPrimaryKey(id: ObjectId): Promise<postCollectionStorage
 }
 
 
-async function findUserByPrimaryKey(id: ObjectId): Promise<WithId<UserCollectionStorageModel> | null> {
+async function findUserByPrimaryKey(id: ObjectId): Promise<UserCollectionStorageModel | null> {
+    console.log("REPEAT ID: ", id.toString());
+
     return usersCollection.findOne({ _id: id });
 }
 
@@ -324,10 +326,14 @@ export const dataQueryRepository = {
 
         if (ObjectId.isValid(userId)) {
 
-            const user: WithId<UserCollectionStorageModel> | null = await findUserByPrimaryKey(new ObjectId(userId));
+            console.log(userId);
+            const user = await findUserByPrimaryKey(new ObjectId(userId));
 
             if(user)
             {
+                console.log("here");
+                console.log(JSON.stringify(user));
+
                 return mapSingleUserCollectionToViewModel(user);
             }
         }
@@ -343,4 +349,16 @@ export const dataQueryRepository = {
             $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
         });
     },
+
+
+    // *****************************
+    // методы для тестов
+    // *****************************
+    async returnBloggersAmount() {
+        return await bloggersCollection.countDocuments();
+    },
+
+    async returnUsersAmount() {
+        return await usersCollection.countDocuments();
+    }
 }
