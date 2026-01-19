@@ -14,8 +14,10 @@ export const attemptToLogin = async (req: Request<{}, {}, LoginInputModel, {}>, 
 
     const { loginOrEmail, password } = req.body;
 
+
     const accessToken = await authService.loginUser(loginOrEmail, password);
+
     if (!accessToken) return res.sendStatus(HttpStatus.Unauthorized);
 
-    return res.status(HttpStatus.NoContent).send({ accessToken });
+    return res.status(HttpStatus.NoContent).end(); //статус 204 не предполагает наличие тела ответа. но без send() совсем - роут виснет
 }

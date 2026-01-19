@@ -26,9 +26,9 @@ const emailValidation = body('email')
 const loginAndEmailValidation = body('loginOrEmail')
     .exists().withMessage('Field \'loginOrEmail\' must be specified')
     .isString().withMessage('Incorrect type of field \'loginOrEmail\' - must be string')
-    .trim()
-    .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
-    .withMessage('Field \'loginOrEmail\' contains inappropriate symbols');
+    // .trim()
+    // .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+    // .withMessage('Field \'loginOrEmail\' contains inappropriate symbols');
 
 
 export const userInputModelValidation = [
