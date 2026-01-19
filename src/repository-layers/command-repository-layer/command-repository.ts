@@ -428,9 +428,10 @@ export const dataCommandRepository = {
                 }
             }
             else {
-                throw new CustomError({
-                    errorMessage: { field: 'ObjectId.isValid(blogId)', message: 'invalid blog ID' }
-                });
+                // throw new CustomError({
+                //     errorMessage: { field: 'ObjectId.isValid(blogId)', message: 'invalid blog ID' }
+                // });
+                return undefined;
             }
         }
         catch (error) {
@@ -792,9 +793,11 @@ export const dataCommandRepository = {
                 }
             }
             else {
-                throw new CustomError({
-                    errorMessage: { field: 'ObjectId.isValid(userId)', message: 'invalid user ID' }
-                });
+                // throw new CustomError({
+                //     errorMessage: { field: 'ObjectId.isValid(userId)', message: 'invalid user ID' }
+                // });
+
+                return undefined;
             }
         }
         catch (error) {

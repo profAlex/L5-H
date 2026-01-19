@@ -28,7 +28,7 @@ export const usersService = {
         return await dataCommandRepository.createNewUser(newUser);
     },
 
-    async deleteUser (userId: string) {
+    async deleteUser (userId: string) : Promise<null | undefined> {
         return await dataCommandRepository.deleteUser(userId);
     },
 }

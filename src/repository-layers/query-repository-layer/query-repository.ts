@@ -33,8 +33,6 @@ async function findPostByPrimaryKey(id: ObjectId): Promise<postCollectionStorage
 
 
 async function findUserByPrimaryKey(id: ObjectId): Promise<UserCollectionStorageModel | null> {
-    console.log("REPEAT ID: ", id.toString());
-
     return usersCollection.findOne({ _id: id });
 }
 
@@ -326,14 +324,10 @@ export const dataQueryRepository = {
 
         if (ObjectId.isValid(userId)) {
 
-            console.log(userId);
             const user = await findUserByPrimaryKey(new ObjectId(userId));
 
             if(user)
             {
-                console.log("here");
-                console.log(JSON.stringify(user));
-
                 return mapSingleUserCollectionToViewModel(user);
             }
         }
