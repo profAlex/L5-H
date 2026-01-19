@@ -735,7 +735,7 @@ export const dataCommandRepository = {
                 createdAt: new Date(),
             } as UserCollectionStorageModel;
 
-            console.log(JSON.stringify(newUserEntry));
+            // console.log(JSON.stringify(newUserEntry));
 
             const result = await usersCollection.insertOne(newUserEntry);
 

@@ -29,6 +29,6 @@ export const usersService = {
     },
 
     async deleteUser (userId: string) {
-        return await dataCommandRepository.deleteBlog(userId);
+        return await dataCommandRepository.deleteUser(userId);
     },
 }
